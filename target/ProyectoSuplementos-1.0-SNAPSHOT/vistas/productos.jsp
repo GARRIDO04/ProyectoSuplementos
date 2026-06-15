@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light"> <div class="container mt-5">
+        <jsp:include page="navbar.jsp" />
         
         <div class="text-center mb-4">
             <h1 class="display-5 fw-bold text-uppercase">Gestión de Suplementos Perrones</h1>
