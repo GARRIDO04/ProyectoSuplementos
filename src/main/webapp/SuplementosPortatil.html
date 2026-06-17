@@ -17,7 +17,7 @@
         .card-custom:hover { transform: translateY(-5px); }
         
         /* MAGIA DEL ROL: Si el body tiene esta clase, oculta todo lo exclusivo de admin */
-        body.modo-visitante .admin-only {
+        body.modo-usuario .admin-only {
             display: none !important;
         }
 
@@ -56,7 +56,7 @@
                         <form id="formLogin" onsubmit="iniciarSesion(event)">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Usuario</label>
-                                <input type="text" id="loginUsr" class="form-control" required placeholder="admin o visitante">
+                                <input type="text" id="loginUsr" class="form-control" required placeholder="admin o usuario">
                             </div>
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Contraseña</label>
@@ -65,7 +65,7 @@
                             <button type="submit" class="btn btn-warning w-100 fw-bold fs-5">Ingresar al Sistema</button>
                         </form>
                         <div class="mt-3 text-center">
-                            <small class="text-info">Credenciales de prueba:<br>Admin: <b>admin</b> / <b>123</b> <br>Vendedor: <b>visitante</b> / <b>123</b></small>
+                            <small class="text-info">Credenciales de prueba:<br>Admin: <b>admin</b> / <b>123</b> <br>Usuario: <b>usuario</b> / <b>123</b></small>
                         </div>
                     </div>
                 </div>
@@ -101,9 +101,8 @@
                     <h1 class="display-4 fw-bold text-uppercase text-warning">Panel de Control Local</h1>
                     <p id="mensajeRol" class="fs-4 mt-3 text-light"></p>
                 </div>
-                <div class="row text-center g-4">
-                    <div class="col-md-4">
-                        <div class="card card-custom p-4 shadow h-100">
+                <div class="row text-center g-4 justify-content-center"> 
+                    <div class="col-md-4 admin-only"> <div class="card card-custom p-4 shadow h-100">
                             <h4 class="fw-bold text-success">Ingresos Totales</h4>
                             <h1 id="dashIngresos" class="display-5 fw-bold mt-2">$0.00</h1>
                         </div>
@@ -256,7 +255,7 @@
                     </div>
                 </div>
                 <table class="table table-dark table-striped">
-                    <thead><tr><th>Producto</th><th>Cliente</th><th>Cantidad</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
+                    <thead><tr><th>Fecha</th><th class="admin-only">Vendedor</th><th>Producto</th><th>Cliente</th><th>Cantidad</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
                     <tbody id="tablaVentas"></tbody>
                 </table>
             </div>
@@ -265,8 +264,6 @@
 
     <script>
         // --- FUNCIONES MATEMÁTICAS AUTOMÁTICAS ---
-        
-        // Jala el precio del producto guardado al seleccionarlo en la venta
         function actualizarPrecioVenta() {
             let nombreProd = document.getElementById('venProd').value;
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
@@ -277,17 +274,15 @@
             } else {
                 document.getElementById('venPrecio').value = '';
             }
-            calcularTotalVenta(); // Ejecuta la multiplicación en cuanto jala el precio
+            calcularTotalVenta();
         }
 
-        // Multiplica Precio Venta x Cantidad
         function calcularTotalVenta() {
             let precio = parseFloat(document.getElementById('venPrecio').value) || 0;
             let cantidad = parseInt(document.getElementById('venCant').value) || 0;
             document.getElementById('venTotal').value = (precio * cantidad).toFixed(2);
         }
 
-        // Multiplica Costo Compra x Cantidad
         function calcularTotalCompra() {
             let precio = parseFloat(document.getElementById('compPrecio').value) || 0;
             let cantidad = parseInt(document.getElementById('compCant').value) || 0;
@@ -298,7 +293,7 @@
         // --- SISTEMA DE LOGIN Y SESIONES ---
         const credenciales = {
             'admin': { pass: '123', rol: 'admin', saludo: 'Modo Administrador: Acceso Total' },
-            'visitante': { pass: '123', rol: 'visitante', saludo: 'Modo Vendedor: Registro de Ventas y Consultas' }
+            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo Usuario: Catálogo y Ventas Personales' }
         };
 
         function iniciarSesion(e) {
@@ -329,10 +324,10 @@
 
             let datosUsuario = credenciales[usuarioActual];
             
-            if (datosUsuario.rol === 'visitante') {
-                document.body.classList.add('modo-visitante');
+            if (datosUsuario.rol === 'usuario') {
+                document.body.classList.add('modo-usuario');
             } else {
-                document.body.classList.remove('modo-visitante');
+                document.body.classList.remove('modo-usuario');
             }
 
             document.getElementById('mensajeRol').innerText = datosUsuario.saludo;
@@ -343,7 +338,7 @@
 
         function cerrarSesion() {
             localStorage.removeItem('sesion_suplementos');
-            document.body.classList.remove('modo-visitante');
+            document.body.classList.remove('modo-usuario');
             verificarSesion();
         }
 
@@ -352,7 +347,9 @@
             let bd = tipo === 'Venta' ? 'bd_ventas' : 'bd_compras';
             let datos = JSON.parse(localStorage.getItem(bd)) || [];
             let transaccion = datos[index];
-            let fechaHora = new Date().toLocaleString('es-MX');
+            // Usa la fecha guardada, o la actual si es un ticket viejo sin fecha
+            let fechaHora = transaccion.fecha || new Date().toLocaleString('es-MX');
+            let vendedorText = tipo === 'Venta' && transaccion.vendedor ? `<br><b>Le atendió:</b> ${transaccion.vendedor}` : '';
 
             let htmlTicket = `
                 <div style="width: 300px; margin: 0 auto; font-family: monospace; border: 1px dashed #000; padding: 20px;">
@@ -363,6 +360,7 @@
                     <p style="font-size: 14px;">
                         <b>Fecha:</b> ${fechaHora}<br>
                         <b>${tipo === 'Venta' ? 'Cliente' : 'Proveedor'}:</b> ${tipo === 'Venta' ? transaccion.cliente : transaccion.proveedor}
+                        ${vendedorText}
                     </p>
                     <hr style="border-top: 1px dashed black;">
                     <div style="font-size: 14px; margin-bottom: 10px;">
@@ -533,7 +531,7 @@
             e.preventDefault();
             let nombreProd = document.getElementById('compProd').value; 
             let cantidad = parseInt(document.getElementById('compCant').value);
-            let totalAuto = document.getElementById('compTotal').value; // Toma el cálculo automático
+            let totalAuto = document.getElementById('compTotal').value;
 
             let datos = JSON.parse(localStorage.getItem('bd_compras')) || [];
             datos.push({ producto: nombreProd, proveedor: document.getElementById('compProv').value, cantidad: cantidad, total: totalAuto });
@@ -563,11 +561,12 @@
             </td></tr>`;
         }
 
+        // --- AUDITORÍA Y REGISTRO DE VENTAS ---
         function guardarVenta(e) {
             e.preventDefault();
             let nombreProd = document.getElementById('venProd').value; 
             let cantidad = parseInt(document.getElementById('venCant').value);
-            let totalAuto = document.getElementById('venTotal').value; // Toma el cálculo automático
+            let totalAuto = document.getElementById('venTotal').value;
 
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
             let prodSeleccionado = productos.find(p => p.nombre === nombreProd);
@@ -576,8 +575,19 @@
                 alert(`⚠️ Error: Stock insuficiente. Tienes ${prodSeleccionado ? prodSeleccionado.stock : 0} unidades disponibles.`); return;
             }
 
+            // Datos de Auditoría
+            let vendedorActual = localStorage.getItem('sesion_suplementos');
+            let fechaActual = new Date().toLocaleString('es-MX');
+
             let datos = JSON.parse(localStorage.getItem('bd_ventas')) || [];
-            datos.push({ producto: nombreProd, cliente: document.getElementById('venCli').value, cantidad: cantidad, total: totalAuto });
+            datos.push({ 
+                fecha: fechaActual,
+                vendedor: vendedorActual,
+                producto: nombreProd, 
+                cliente: document.getElementById('venCli').value, 
+                cantidad: cantidad, 
+                total: totalAuto 
+            });
             localStorage.setItem('bd_ventas', JSON.stringify(datos));
             
             actualizarStock(nombreProd, cantidad, 'venta');
@@ -600,12 +610,33 @@
             document.getElementById('venTotal').value = datos[i].total;
             borrarVenta(i);
         }
+        
+        // --- FILTRO DE VENTAS ---
         function generarFilaVenta(v, i, bd, tabla) {
-            return `<tr><td>${v.producto}</td><td>${v.cliente}</td><td>${v.cantidad}</td><td>$${v.total}</td><td class="text-center">
-                <button class="btn btn-sm btn-light text-dark fw-bold me-2" onclick="imprimirTicket('Venta', ${i})">Ticket</button>
-                <button class="btn btn-sm btn-info text-dark fw-bold me-2 admin-only" onclick="editarVenta(${i})">Editar</button>
-                <button class="btn btn-sm btn-danger fw-bold admin-only" onclick="borrarVenta(${i})">Borrar</button>
-            </td></tr>`;
+            let currentUser = localStorage.getItem('sesion_suplementos');
+            let isAdmin = (credenciales[currentUser] && credenciales[currentUser].rol === 'admin');
+            
+            // Lógica de Filtro: Si no es admin y la venta NO es de él, no la dibuja
+            if (!isAdmin && v.vendedor !== currentUser) {
+                return ''; 
+            }
+
+            let fechaStr = v.fecha ? v.fecha : 'N/A';
+            let vendedorStr = v.vendedor ? v.vendedor : 'N/A';
+
+            return `<tr>
+                <td>${fechaStr}</td>
+                <td class="admin-only text-warning fw-bold">${vendedorStr}</td>
+                <td>${v.producto}</td>
+                <td>${v.cliente}</td>
+                <td>${v.cantidad}</td>
+                <td>$${v.total}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-light text-dark fw-bold me-2" onclick="imprimirTicket('Venta', ${i})">Ticket</button>
+                    <button class="btn btn-sm btn-info text-dark fw-bold me-2 admin-only" onclick="editarVenta(${i})">Editar</button>
+                    <button class="btn btn-sm btn-danger fw-bold admin-only" onclick="borrarVenta(${i})">Borrar</button>
+                </td>
+            </tr>`;
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
