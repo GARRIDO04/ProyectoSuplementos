@@ -7,7 +7,6 @@
     <style>
         .oculto { display: none !important; }
         
-        /* --- ESTILOS DE DASHBOARD: Fondo negro y borde blanco --- */
         .card-custom { 
             background-color: #000 !important; 
             border: 2px solid #fff !important; 
@@ -16,12 +15,12 @@
         }
         .card-custom:hover { transform: translateY(-5px); }
         
-        /* MAGIA DEL ROL: Si el body tiene esta clase, oculta todo lo exclusivo de admin */
+        /*Deteccion ROL: Si tiene esta clase, ocultar todo lo exclusivo de admin */
         body.modo-usuario .admin-only {
             display: none !important;
         }
 
-        /* ESTILOS DE IMPRESIÓN PARA EL TICKET */
+        /* ESTILO TICKET */
         @media print {
             body * {
                 visibility: hidden;
@@ -60,7 +59,7 @@
                             </div>
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Contraseña</label>
-                                <input type="password" id="loginPass" class="form-control" required placeholder="123">
+                                <input type="password" id="loginPass" class="form-control" required placeholder="">
                             </div>
                             <button type="submit" class="btn btn-warning w-100 fw-bold fs-5">Ingresar al Sistema</button>
                         </form>
@@ -102,9 +101,11 @@
                     <p id="mensajeRol" class="fs-4 mt-3 text-light"></p>
                 </div>
                 <div class="row text-center g-4 justify-content-center"> 
-                    <div class="col-md-4 admin-only"> <div class="card card-custom p-4 shadow h-100">
+                    <div class="col-md-4 admin-only"> 
+                        <div class="card card-custom p-4 shadow h-100">
                             <h4 class="fw-bold text-success">Ingresos Totales</h4>
                             <h1 id="dashIngresos" class="display-5 fw-bold mt-2">$0.00</h1>
+                            <p class="mb-0 text-muted">No. de ventas: <span id="dashTotalVentas" class="text-white fw-bold">0</span></p>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -263,7 +264,7 @@
     </div>
 
     <script>
-        // --- FUNCIONES MATEMÁTICAS AUTOMÁTICAS ---
+        // FUNCIONES MATEMÁTICAS  
         function actualizarPrecioVenta() {
             let nombreProd = document.getElementById('venProd').value;
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
@@ -290,10 +291,10 @@
         }
 
 
-        // --- SISTEMA DE LOGIN Y SESIONES ---
+        // SISTEMA DE LOGIN Y SESIONES
         const credenciales = {
-            'admin': { pass: '123', rol: 'admin', saludo: 'Modo Administrador: Acceso Total' },
-            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo Usuario: Catálogo y Ventas Personales' }
+            'admin': { pass: '123', rol: 'admin', saludo: 'Modo: Administrador Usted cuenta con acceso TOTAL' },
+            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo: Usuario Bienvenido a su gestor Ventas :)' }
         };
 
         function iniciarSesion(e) {
@@ -342,12 +343,11 @@
             verificarSesion();
         }
 
-        // --- SISTEMA DE TICKETS ---
+        // SISTEMA DE TICKETS
         function imprimirTicket(tipo, index) {
             let bd = tipo === 'Venta' ? 'bd_ventas' : 'bd_compras';
             let datos = JSON.parse(localStorage.getItem(bd)) || [];
             let transaccion = datos[index];
-            // Usa la fecha guardada, o la actual si es un ticket viejo sin fecha
             let fechaHora = transaccion.fecha || new Date().toLocaleString('es-MX');
             let vendedorText = tipo === 'Venta' && transaccion.vendedor ? `<br><b>Le atendió:</b> ${transaccion.vendedor}` : '';
 
@@ -380,7 +380,7 @@
             divTicket.classList.add('d-none'); 
         }
 
-        // --- NAVEGACIÓN Y CARGA INICIAL ---
+        // <<<<<<NAVEGACIÓN Y CARGA INICIAL<<<<<
         function cambiarSeccion(seccionActiva) {
             let secciones = ['inicio', 'productos', 'proveedores', 'clientes', 'compras', 'ventas'];
             secciones.forEach(sec => {
@@ -398,7 +398,7 @@
             refrescarUI();
         }
 
-        // --- ACTUALIZACIÓN DINÁMICA ---
+        // --- ACTUALIZACIÓN ---
         function refrescarUI() {
             let ventas = JSON.parse(localStorage.getItem('bd_ventas')) || [];
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
@@ -408,6 +408,7 @@
             let totalStock = productos.reduce((acc, p) => acc + parseInt(p.stock), 0);
 
             document.getElementById('dashIngresos').innerText = '$' + ingresosTotales.toFixed(2);
+            document.getElementById('dashTotalVentas').innerText = ventas.length; // Actualiza número de ventas
             document.getElementById('dashStock').innerText = totalStock;
             document.getElementById('dashClientes').innerText = clientes.length;
 
@@ -427,7 +428,6 @@
             document.getElementById('venCli').innerHTML = cliHTML;
         }
 
-        // --- LÓGICA BASE ---
         function cargarDatos(idTabla, nombreBD, funcionGeneradora) {
             let datos = JSON.parse(localStorage.getItem(nombreBD)) || [];
             let tabla = document.getElementById(idTabla);
@@ -464,7 +464,7 @@
             }
         }
 
-        // --- MÓDULOS DE DATOS ---
+        // MODULOS
 
         function guardarProducto(e) {
             e.preventDefault();
@@ -478,12 +478,20 @@
             document.getElementById('formProducto').reset();
             cargarDatos('tablaProductos', 'bd_productos', generarFilaProducto); refrescarUI();
         }
+        
         function editarProducto(i) {
             let datos = JSON.parse(localStorage.getItem('bd_productos'));
-            document.getElementById('prodNombre').value = datos[i].nombre; document.getElementById('prodCategoria').value = datos[i].categoria;
-            document.getElementById('prodDesc').value = datos[i].descripcion; document.getElementById('prodPrecio').value = datos[i].precio;
-            document.getElementById('prodStock').value = datos[i].stock;
-            eliminarDato(i, 'bd_productos', 'tablaProductos', generarFilaProducto);
+            let item = datos[i]; // Guarda la información temporalmente
+            eliminarDato(i, 'bd_productos', 'tablaProductos', generarFilaProducto); // Borra primero
+            
+            // Llena el formulario DESPUÉS de borrar, así no se pierde al actualizar
+            document.getElementById('prodNombre').value = item.nombre; 
+            document.getElementById('prodCategoria').value = item.categoria;
+            document.getElementById('prodDesc').value = item.descripcion; 
+            document.getElementById('prodPrecio').value = item.precio;
+            document.getElementById('prodStock').value = item.stock;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function generarFilaProducto(p, i, bd, tabla) {
             let stockClase = p.stock <= 5 ? 'text-danger fw-bold' : 'text-success fw-bold';
@@ -500,10 +508,15 @@
         }
         function editarProveedor(i) {
             let datos = JSON.parse(localStorage.getItem('bd_proveedores'));
-            document.getElementById('provNombre').value = datos[i].nombre; document.getElementById('provCorreo').value = datos[i].correo;
-            document.getElementById('provDir').value = datos[i].direccion; document.getElementById('provContacto').value = datos[i].contacto;
-            document.getElementById('provRFC').value = datos[i].rfc || '';
+            let item = datos[i];
             eliminarDato(i, 'bd_proveedores', 'tablaProveedores', generarFilaProveedor);
+
+            document.getElementById('provNombre').value = item.nombre; 
+            document.getElementById('provCorreo').value = item.correo;
+            document.getElementById('provDir').value = item.direccion; 
+            document.getElementById('provContacto').value = item.contacto;
+            document.getElementById('provRFC').value = item.rfc || '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function generarFilaProveedor(p, i, bd, tabla) {
             return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.correo}</td><td>${p.direccion}</td><td>${p.contacto}</td><td>${p.rfc || 'N/A'}</td><td class="text-center"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarProveedor(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProveedor)">Borrar</button></td></tr>`;
@@ -519,9 +532,13 @@
         }
         function editarCliente(i) {
             let datos = JSON.parse(localStorage.getItem('bd_clientes'));
-            document.getElementById('cliNombre').value = datos[i].nombre; document.getElementById('cliTel').value = datos[i].tel;
-            document.getElementById('cliCorreo').value = datos[i].correo;
+            let item = datos[i];
             eliminarDato(i, 'bd_clientes', 'tablaClientes', generarFilaCliente);
+
+            document.getElementById('cliNombre').value = item.nombre; 
+            document.getElementById('cliTel').value = item.tel;
+            document.getElementById('cliCorreo').value = item.correo;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function generarFilaCliente(c, i, bd, tabla) {
             return `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.tel}</td><td>${c.correo}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarCliente(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaCliente)">Borrar</button></td></tr>`;
@@ -548,10 +565,15 @@
         }
         function editarCompra(i) {
             let datos = JSON.parse(localStorage.getItem('bd_compras'));
-            document.getElementById('compProd').value = datos[i].producto; document.getElementById('compProv').value = datos[i].proveedor;
-            document.getElementById('compCant').value = datos[i].cantidad; 
-            document.getElementById('compTotal').value = datos[i].total;
+            let item = datos[i];
             borrarCompra(i);
+
+            document.getElementById('compProd').value = item.producto; 
+            document.getElementById('compProv').value = item.proveedor;
+            document.getElementById('compPrecio').value = (item.total / item.cantidad).toFixed(2);
+            document.getElementById('compCant').value = item.cantidad; 
+            document.getElementById('compTotal').value = item.total;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function generarFilaCompra(c, i, bd, tabla) {
             return `<tr><td>${c.producto}</td><td>${c.proveedor}</td><td>${c.cantidad}</td><td>$${c.total}</td><td class="text-center">
@@ -575,7 +597,6 @@
                 alert(`⚠️ Error: Stock insuficiente. Tienes ${prodSeleccionado ? prodSeleccionado.stock : 0} unidades disponibles.`); return;
             }
 
-            // Datos de Auditoría
             let vendedorActual = localStorage.getItem('sesion_suplementos');
             let fechaActual = new Date().toLocaleString('es-MX');
 
@@ -605,18 +626,22 @@
         }
         function editarVenta(i) {
             let datos = JSON.parse(localStorage.getItem('bd_ventas'));
-            document.getElementById('venProd').value = datos[i].producto; document.getElementById('venCli').value = datos[i].cliente;
-            document.getElementById('venCant').value = datos[i].cantidad; 
-            document.getElementById('venTotal').value = datos[i].total;
+            let item = datos[i];
             borrarVenta(i);
+
+            document.getElementById('venProd').value = item.producto; 
+            document.getElementById('venCli').value = item.cliente;
+            document.getElementById('venPrecio').value = (item.total / item.cantidad).toFixed(2);
+            document.getElementById('venCant').value = item.cantidad; 
+            document.getElementById('venTotal').value = item.total;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        // --- FILTRO DE VENTAS ---
+        // Permisos ver ventas
         function generarFilaVenta(v, i, bd, tabla) {
             let currentUser = localStorage.getItem('sesion_suplementos');
             let isAdmin = (credenciales[currentUser] && credenciales[currentUser].rol === 'admin');
             
-            // Lógica de Filtro: Si no es admin y la venta NO es de él, no la dibuja
             if (!isAdmin && v.vendedor !== currentUser) {
                 return ''; 
             }
