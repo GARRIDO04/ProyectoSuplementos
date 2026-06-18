@@ -293,8 +293,8 @@
 
         // SISTEMA DE LOGIN Y SESIONES
         const credenciales = {
-            'admin': { pass: '123', rol: 'admin', saludo: 'Modo: Administrador Usted cuenta con acceso TOTAL' },
-            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo: Usuario Bienvenido a su gestor Ventas :)' }
+            'admin': { pass: '123', rol: 'admin', saludo: 'Modo: Administrador <br> Usted cuenta con acceso TOTAL' },
+            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo: Usuario <br> Bienvenido a su gestor Ventas :)' }
         };
 
         function iniciarSesion(e) {
@@ -331,7 +331,7 @@
                 document.body.classList.remove('modo-usuario');
             }
 
-            document.getElementById('mensajeRol').innerText = datosUsuario.saludo;
+            document.getElementById('mensajeRol').innerHTML = datosUsuario.saludo;
 
             cambiarSeccion('inicio');
             cargarTodasLasTablas();

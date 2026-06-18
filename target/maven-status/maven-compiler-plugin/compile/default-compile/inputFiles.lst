@@ -1,12 +1,15 @@
+C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\controlador\ControladorLogin.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\com\mycompany\ProyectoSuplementos\resources\JakartaEE10Resource.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\config\Conexion.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\controlador\ControladorProducto.java
-C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\ProductoDAO.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\controlador\ControladorCliente.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\Proveedor.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\ProveedorDAO.java
-C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\com\mycompany\ProyectoSuplementos\JakartaRestConfiguration.java
+C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\UsuarioDAO.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\Producto.java
+C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\ProductoDAO.java
+C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\com\mycompany\ProyectoSuplementos\JakartaRestConfiguration.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\Cliente.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\controlador\ControladorProveedor.java
+C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\Usuario.java
 C:\Users\Luis\Documents\NetBeansProjects\ProyectoSuplementos\src\main\java\modelo\ClienteDAO.java

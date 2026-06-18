@@ -1,12 +1,15 @@
 modelo\Proveedor.class
 config\Conexion.class
+modelo\UsuarioDAO.class
 com\mycompany\ProyectoSuplementos\JakartaRestConfiguration.class
 controlador\ControladorProducto.class
 controlador\ControladorProveedor.class
 com\mycompany\ProyectoSuplementos\resources\JakartaEE10Resource.class
 modelo\Cliente.class
 modelo\Producto.class
+controlador\ControladorLogin.class
 modelo\ClienteDAO.class
 modelo\ProductoDAO.class
 controlador\ControladorCliente.class
+modelo\Usuario.class
 modelo\ProveedorDAO.class
