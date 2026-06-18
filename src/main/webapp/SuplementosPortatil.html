@@ -352,9 +352,11 @@
             let fechaHora = transaccion.fecha || new Date().toLocaleString('es-MX');
             let vendedorText = tipo === 'Venta' && transaccion.vendedor ? `<br><b>Le atendió:</b> ${transaccion.vendedor}` : '';
 
-            // Cálculos para el desglose (Asumiendo IVA del 16%)
+            // Cálculos para el desglose
             let total = parseFloat(transaccion.total);
-            let subtotal = total / 1.16;
+            let cantidad = parseInt(transaccion.cantidad);
+            let precioUnitario = total / cantidad;
+            let subtotal = total / 1.16; // Asumiendo IVA del 16%
             let iva = total - subtotal;
 
             let htmlTicket = `
@@ -375,13 +377,15 @@
                             <tr style="border-bottom: 1px solid black;">
                                 <th style="text-align: left; padding-bottom: 4px;">Cant</th>
                                 <th style="text-align: left; padding-bottom: 4px;">Descripción</th>
+                                <th style="text-align: right; padding-bottom: 4px;">P.Unit</th>
                                 <th style="text-align: right; padding-bottom: 4px;">Importe</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="text-align: left; vertical-align: top; padding-top: 4px;">${transaccion.cantidad}</td>
+                                <td style="text-align: left; vertical-align: top; padding-top: 4px;">${cantidad}</td>
                                 <td style="text-align: left; vertical-align: top; padding-top: 4px; padding-right: 5px;">${transaccion.producto}</td>
+                                <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${precioUnitario.toFixed(2)}</td>
                                 <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${total.toFixed(2)}</td>
                             </tr>
                         </tbody>
