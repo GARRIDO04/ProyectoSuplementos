@@ -7,7 +7,7 @@
     <style>
         .oculto { display: none !important; }
         
-        /* --- ESTILOS DE DASHBOARD: Fondo negro y borde blanco --- */
+        /* --- ESTILOS DE DASHBOARD --- */
         .card-custom { 
             background-color: #000 !important; 
             border: 2px solid #fff !important; 
@@ -16,34 +16,56 @@
         }
         .card-custom:hover { transform: translateY(-5px); }
         
-        /* MAGIA DEL ROL: Si el body tiene esta clase, oculta todo lo exclusivo de admin */
         body.modo-usuario .admin-only {
             display: none !important;
         }
 
+        /* AJUSTES PARA ETIQUETAS FLOTANTES EN MODO OSCURO */
+        .form-floating label { color: #6c757d; }
+        .form-floating > .form-control:focus ~ label, 
+        .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        .form-floating > .form-select ~ label {
+            color: #000 !important; 
+            font-weight: bold;
+        }
+
         /* ESTILOS DE IMPRESIÓN PARA EL TICKET */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #zonaTicket, #zonaTicket * {
-                visibility: visible;
-            }
+            body * { visibility: hidden !important; }
+            #zonaTicket, #zonaTicket * { visibility: visible !important; }
             #zonaTicket {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                color: black !important;
-                background: white !important;
+                position: absolute; left: 0; top: 0; width: 100%;
+                color: black !important; background: white !important;
             }
+            .d-print-none { display: none !important; }
         }
     </style>
 </head>
 <body class="bg-dark text-light" onload="verificarSesion()">
 
+    <!-- ZONA DE IMPRESIÓN OCULTA -->
     <div id="zonaTicket" class="d-none text-dark bg-white"></div>
 
+    <!-- MODAL VISTA PREVIA DEL TICKET -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-dark">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title fw-bold">Vista Previa del Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex justify-content-center bg-light" id="ticketModalBody">
+                    <!-- El diseño del ticket se inyecta aquí -->
+                </div>
+                <div class="modal-footer bg-light d-print-none">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Cerrar sin imprimir</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="window.print()">🖨️ Imprimir Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE LOGIN -->
     <div id="loginScreen" class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-5">
@@ -54,25 +76,23 @@
                 <div class="card bg-secondary text-light shadow-lg">
                     <div class="card-body p-4">
                         <form id="formLogin" onsubmit="iniciarSesion(event)">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Usuario</label>
-                                <input type="text" id="loginUsr" class="form-control" required placeholder="admin o usuario">
+                            <div class="form-floating mb-3">
+                                <input type="text" id="loginUsr" class="form-control" required placeholder="Usuario">
+                                <label>Usuario</label>
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Contraseña</label>
-                                <input type="password" id="loginPass" class="form-control" required placeholder="123">
+                            <div class="form-floating mb-4">
+                                <input type="password" id="loginPass" class="form-control" required placeholder="Contraseña">
+                                <label>Contraseña</label>
                             </div>
                             <button type="submit" class="btn btn-warning w-100 fw-bold fs-5">Ingresar al Sistema</button>
                         </form>
-                        <div class="mt-3 text-center">
-                            <small class="text-info">Credenciales de prueba:<br>Admin: <b>admin</b> / <b>123</b> <br>Usuario: <b>usuario</b> / <b>123</b></small>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- APLICACIÓN PRINCIPAL -->
     <div id="appPrincipal" class="oculto">
         <nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-4 shadow">
             <div class="container">
@@ -95,7 +115,8 @@
             </div>
         </nav>
 
-        <div class="container">
+        <div class="container pb-5">
+            <!-- DASHBOARD -->
             <div id="inicio" class="mt-4">
                 <div class="text-center mb-5">
                     <h1 class="display-4 fw-bold text-uppercase text-warning">Panel de Control Local</h1>
@@ -124,6 +145,7 @@
                 </div>
             </div>
 
+            <!-- PRODUCTOS -->
             <div id="productos" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Inventario de Productos</h2>
                 <div class="card bg-secondary text-light shadow mb-4 admin-only"> 
@@ -131,24 +153,37 @@
                         <form id="formProducto" onsubmit="guardarProducto(event)">
                             <input type="hidden" id="prodIdHidden" value="">
                             <div class="row g-3 mb-3">
-                                <div class="col-md-4"><input type="text" id="prodNombre" class="form-control" placeholder="Nombre del Producto" required></div>
-                                <div class="col-md-4"><input type="text" id="prodCategoria" class="form-control" placeholder="Categoría" required></div>
-                                <div class="col-md-4"><input type="text" id="prodDesc" class="form-control" placeholder="Descripción" required></div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="prodNombre" class="form-control" placeholder="Nombre" required><label>Nombre del Producto</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="prodCategoria" class="form-control" placeholder="Categoría" required><label>Categoría</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="prodDesc" class="form-control" placeholder="Descripción" required><label>Descripción</label></div>
+                                </div>
                             </div>
                             <div class="row g-3">
-                                <div class="col-md-4"><input type="number" step="0.01" id="prodPrecio" class="form-control" placeholder="Precio de Venta $" required></div>
-                                <div class="col-md-4"><input type="number" id="prodStock" class="form-control" placeholder="Stock Inicial" required></div>
-                                <div class="col-md-4"><button type="submit" id="btnGuardarProd" class="btn btn-warning w-100 fw-bold">Guardar Producto</button></div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="number" step="0.01" id="prodPrecio" class="form-control" placeholder="Precio $" required><label>Precio de Venta $</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="number" id="prodStock" class="form-control" placeholder="Stock Inicial" required><label>Stock Inicial</label></div>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-center">
+                                    <button type="submit" id="btnGuardarProd" class="btn btn-warning w-100 fw-bold fs-5 h-100">Guardar Producto</button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
                 <table class="table table-dark table-striped">
-                    <thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Descripción</th><th>Precio $</th><th>Stock</th><th class="text-center admin-only">Acciones</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio $</th><th>Stock</th><th class="text-center admin-only">Acciones</th></tr></thead>
                     <tbody id="tablaProductos"></tbody>
                 </table>
             </div>
 
+            <!-- PROVEEDORES -->
             <div id="proveedores" class="oculto admin-only">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Catálogo de Proveedores</h2>
                 <div class="card bg-secondary text-light shadow mb-4">
@@ -156,24 +191,37 @@
                         <form id="formProveedor" onsubmit="guardarProveedor(event)">
                             <input type="hidden" id="provIdHidden" value="">
                             <div class="row g-3 mb-3">
-                                <div class="col-md-4"><input type="text" id="provNombre" class="form-control" placeholder="Nombre" required></div>
-                                <div class="col-md-4"><input type="email" id="provCorreo" class="form-control" placeholder="Correo Electrónico" required></div>
-                                <div class="col-md-4"><input type="text" id="provDir" class="form-control" placeholder="Dirección" required></div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="provNombre" class="form-control" placeholder="Nombre" required><label>Nombre del Proveedor</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="email" id="provCorreo" class="form-control" placeholder="Correo" required><label>Correo Electrónico</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="provDir" class="form-control" placeholder="Dirección" required><label>Dirección</label></div>
+                                </div>
                             </div>
                             <div class="row g-3">
-                                <div class="col-md-4"><input type="text" id="provContacto" class="form-control" placeholder="Persona de Contacto" required></div>
-                                <div class="col-md-4"><input type="text" id="provRFC" class="form-control" placeholder="RFC"></div>
-                                <div class="col-md-4"><button type="submit" id="btnGuardarProv" class="btn btn-warning w-100 fw-bold">Guardar Proveedor</button></div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="provContacto" class="form-control" placeholder="Contacto" required><label>Persona de Contacto</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="provRFC" class="form-control" placeholder="RFC"><label>RFC (Opcional)</label></div>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-center">
+                                    <button type="submit" id="btnGuardarProv" class="btn btn-warning w-100 fw-bold fs-5 h-100">Guardar Proveedor</button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
                 <table class="table table-dark table-striped">
-                    <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Dirección</th><th>Contacto</th><th>RFC</th><th class="text-center">Acciones</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Correo</th><th>Contacto</th><th>RFC</th><th class="text-center">Acciones</th></tr></thead>
                     <tbody id="tablaProveedores"></tbody>
                 </table>
             </div>
 
+            <!-- CLIENTES -->
             <div id="clientes" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Directorio de Clientes</h2>
                 <div class="card bg-secondary text-light shadow mb-4">
@@ -181,88 +229,148 @@
                         <form id="formCliente" onsubmit="guardarCliente(event)">
                             <input type="hidden" id="cliIdHidden" value="">
                             <div class="row g-3 mb-3">
-                                <div class="col-md-4"><input type="text" id="cliNombre" class="form-control" placeholder="Nombre del Cliente" required></div>
-                                <div class="col-md-4"><input type="text" id="cliTel" class="form-control" placeholder="Teléfono" required></div>
-                                <div class="col-md-4"><input type="email" id="cliCorreo" class="form-control" placeholder="Correo" required></div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="cliNombre" class="form-control" placeholder="Nombre" required><label>Nombre del Cliente</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="text" id="cliTel" class="form-control" placeholder="Teléfono" required><label>Teléfono</label></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating"><input type="email" id="cliCorreo" class="form-control" placeholder="Correo" required><label>Correo Electrónico</label></div>
+                                </div>
                             </div>
                             <div class="row g-3">
-                                <div class="col-md-12"><button type="submit" id="btnGuardarCli" class="btn btn-warning w-100 fw-bold">Guardar Cliente</button></div>
+                                <div class="col-md-12">
+                                    <button type="submit" id="btnGuardarCli" class="btn btn-warning w-100 fw-bold fs-5">Guardar Cliente</button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
                 <table class="table table-dark table-striped">
-                    <thead><tr><th>ID</th><th>Nombre</th><th>Teléfono</th><th>Correo</th><th class="text-center admin-only">Acciones</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th class="text-center admin-only">Acciones</th></tr></thead>
                     <tbody id="tablaClientes"></tbody>
                 </table>
             </div>
 
+            <!-- COMPRAS (Con Carrito) -->
             <div id="compras" class="oculto admin-only">
-                <h2 class="text-info border-bottom border-info pb-2 mb-4">Registro de Compras</h2>
-                <div class="card bg-secondary text-light shadow mb-4">
+                <h2 class="text-info border-bottom border-info pb-2 mb-4">Registro de Compras (Entrada de Almacén)</h2>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select id="compProvGlobal" class="form-select"></select>
+                            <label>Selecciona el Proveedor (Global para la compra)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-dark border-info text-light shadow mb-4">
                     <div class="card-body">
-                        <form id="formCompra" onsubmit="guardarCompra(event)">
-                            <input type="hidden" id="compIndexHidden" value="">
+                        <form id="formAgregarCompra" onsubmit="agregarAlCarritoCompra(event)">
                             <div class="row g-3">
-                                <div class="col-md-2">
-                                    <select id="compProd" class="form-select" required></select>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select id="compProd" class="form-select" required></select>
+                                        <label>Producto a ingresar</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <select id="compProv" class="form-select" required></select>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" step="0.01" id="compPrecio" class="form-control" placeholder="Costo" required>
+                                        <label>Costo Unitario $</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" step="0.01" id="compPrecio" class="form-control" placeholder="Costo Unit. $" oninput="calcularTotalCompra()" required>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" id="compCant" class="form-control" placeholder="Cantidad" required>
+                                        <label>Cantidad</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" id="compCant" class="form-control" placeholder="Cantidad" oninput="calcularTotalCompra()" required>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" step="0.01" id="compTotal" class="form-control bg-dark text-white" placeholder="Total $" readonly required>
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="submit" id="btnGuardarComp" class="btn btn-info w-100 fw-bold">Registrar</button>
+                                <div class="col-md-2 d-flex">
+                                    <button type="submit" class="btn btn-outline-info w-100 fw-bold">Añadir al Lote</button>
                                 </div>
                             </div>
                         </form>
+                        
+                        <hr class="border-info mt-4">
+                        <h5 class="text-info">Artículos en esta compra:</h5>
+                        <table class="table table-dark table-sm mt-3">
+                            <thead><tr><th>Producto</th><th>Costo Unit.</th><th>Cant.</th><th>Subtotal</th><th>Quitar</th></tr></thead>
+                            <tbody id="tablaCarritoCompra"></tbody>
+                        </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <h3 class="fw-bold mb-0">Total: $<span id="compTotalGlobal">0.00</span></h3>
+                            <button onclick="finalizarCompra()" class="btn btn-info fw-bold fs-5 px-5 text-dark">Finalizar y Guardar Compra</button>
+                        </div>
                     </div>
                 </div>
+
+                <h4 class="mt-5">Historial de Compras</h4>
                 <table class="table table-dark table-striped">
-                    <thead><tr><th>Producto</th><th>Proveedor</th><th>Cantidad</th><th>Total $</th><th class="text-center">Acciones</th></tr></thead>
+                    <thead><tr><th>Fecha</th><th>Proveedor</th><th>Artículos</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
                     <tbody id="tablaCompras"></tbody>
                 </table>
             </div>
 
+            <!-- VENTAS (Con Carrito) -->
             <div id="ventas" class="oculto">
-                <h2 class="text-success border-bottom border-success pb-2 mb-4">Registro de Ventas</h2>
-                <div class="card bg-secondary text-light shadow mb-4">
+                <h2 class="text-success border-bottom border-success pb-2 mb-4">Punto de Venta</h2>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select id="venCliGlobal" class="form-select"></select>
+                            <label>Selecciona el Cliente (Global para la venta)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-dark border-success text-light shadow mb-4">
                     <div class="card-body">
-                        <form id="formVenta" onsubmit="guardarVenta(event)">
-                            <input type="hidden" id="venIndexHidden" value="">
+                        <form id="formAgregarVenta" onsubmit="agregarAlCarritoVenta(event)">
                             <div class="row g-3">
-                                <div class="col-md-2">
-                                    <select id="venProd" class="form-select" onchange="actualizarPrecioVenta()" required></select>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select id="venProd" class="form-select" onchange="actualizarPrecioVenta()" required></select>
+                                        <label>Selecciona el Producto</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <select id="venCli" class="form-select" required></select>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" step="0.01" id="venPrecio" class="form-control bg-secondary text-white" placeholder="Precio" readonly required>
+                                        <label>Precio Unitario $</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" step="0.01" id="venPrecio" class="form-control" placeholder="Precio Venta $" oninput="calcularTotalVenta()" required>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" id="venCant" class="form-control" placeholder="Cantidad" required>
+                                        <label>Cantidad</label>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <input type="number" id="venCant" class="form-control" placeholder="Cantidad" oninput="calcularTotalVenta()" required>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" step="0.01" id="venTotal" class="form-control bg-dark text-white" placeholder="Total $" readonly required>
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="submit" id="btnGuardarVen" class="btn btn-success w-100 fw-bold">Registrar</button>
+                                <div class="col-md-2 d-flex">
+                                    <button type="submit" class="btn btn-outline-success w-100 fw-bold">Añadir al Carrito</button>
                                 </div>
                             </div>
                         </form>
+                        
+                        <hr class="border-success mt-4">
+                        <h5 class="text-success">🛒 Carrito de Compras:</h5>
+                        <table class="table table-dark table-sm mt-3">
+                            <thead><tr><th>Producto</th><th>Precio Unit.</th><th>Cant.</th><th>Subtotal</th><th>Quitar</th></tr></thead>
+                            <tbody id="tablaCarritoVenta"></tbody>
+                        </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <h3 class="fw-bold mb-0 text-white">Total a Pagar: <span class="text-success">$<span id="venTotalGlobal">0.00</span></span></h3>
+                            <button onclick="finalizarVenta()" class="btn btn-success fw-bold fs-5 px-5">✅ Cobrar y Finalizar</button>
+                        </div>
                     </div>
                 </div>
+
+                <h4 class="mt-5">Historial de Ventas</h4>
                 <table class="table table-dark table-striped">
-                    <thead><tr><th>Fecha</th><th class="admin-only">Vendedor</th><th>Producto</th><th>Cliente</th><th>Cantidad</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
+                    <thead><tr><th>Fecha</th><th class="admin-only">Vendedor</th><th>Cliente</th><th>Artículos</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
                     <tbody id="tablaVentas"></tbody>
                 </table>
             </div>
@@ -270,36 +378,14 @@
     </div>
 
     <script>
-        // FUNCIONES MATEMÁTICAS  
-        function actualizarPrecioVenta() {
-            let nombreProd = document.getElementById('venProd').value;
-            let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
-            let prodSeleccionado = productos.find(p => p.nombre === nombreProd);
-            
-            if (prodSeleccionado) {
-                document.getElementById('venPrecio').value = prodSeleccionado.precio;
-            } else {
-                document.getElementById('venPrecio').value = '';
-            }
-            calcularTotalVenta();
-        }
-
-        function calcularTotalVenta() {
-            let precio = parseFloat(document.getElementById('venPrecio').value) || 0;
-            let cantidad = parseInt(document.getElementById('venCant').value) || 0;
-            document.getElementById('venTotal').value = (precio * cantidad).toFixed(2);
-        }
-
-        function calcularTotalCompra() {
-            let precio = parseFloat(document.getElementById('compPrecio').value) || 0;
-            let cantidad = parseInt(document.getElementById('compCant').value) || 0;
-            document.getElementById('compTotal').value = (precio * cantidad).toFixed(2);
-        }
+        // CARRITOS DE COMPRA Y VENTA
+        let carritoVentas = [];
+        let carritoCompras = [];
 
         // SISTEMA DE LOGIN Y SESIONES
         const credenciales = {
             'admin': { pass: '123', rol: 'admin', saludo: 'Modo: Administrador <br> Usted cuenta con acceso TOTAL' },
-            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo: Usuario <br> Bienvenido a su gestor Ventas :)' }
+            'usuario': { pass: '123', rol: 'usuario', saludo: 'Modo: Usuario <br> Bienvenido a su Punto de Venta' }
         };
 
         function iniciarSesion(e) {
@@ -318,7 +404,6 @@
 
         function verificarSesion() {
             let usuarioActual = localStorage.getItem('sesion_suplementos');
-            
             if (!usuarioActual || !credenciales[usuarioActual]) {
                 document.getElementById('loginScreen').classList.remove('oculto');
                 document.getElementById('appPrincipal').classList.add('oculto');
@@ -329,13 +414,7 @@
             document.getElementById('appPrincipal').classList.remove('oculto');
 
             let datosUsuario = credenciales[usuarioActual];
-            
-            if (datosUsuario.rol === 'usuario') {
-                document.body.classList.add('modo-usuario');
-            } else {
-                document.body.classList.remove('modo-usuario');
-            }
-
+            document.body.classList.toggle('modo-usuario', datosUsuario.rol === 'usuario');
             document.getElementById('mensajeRol').innerHTML = datosUsuario.saludo;
 
             cambiarSeccion('inicio');
@@ -348,55 +427,67 @@
             verificarSesion();
         }
 
-        // SISTEMA DE TICKETS
-        function imprimirTicket(tipo, index) {
+        // TICKET VISUAL Y DE IMPRESIÓN (MODAL)
+        function mostrarTicket(tipo, index) {
             let bd = tipo === 'Venta' ? 'bd_ventas' : 'bd_compras';
             let datos = JSON.parse(localStorage.getItem(bd)) || [];
             let transaccion = datos[index];
             if (!transaccion) return;
 
             let fechaHora = transaccion.fecha || new Date().toLocaleString('es-MX');
-            let vendedorText = tipo === 'Venta' && transaccion.vendedor ? `<br><b>Le atendió:</b> ${transaccion.vendedor}` : '';
-
-            // Cálculos para el desglose
+            let vendedorText = tipo === 'Venta' && transaccion.vendedor ? `<br><b>Atendió:</b> ${transaccion.vendedor}` : '';
+            let entidadText = tipo === 'Venta' ? transaccion.cliente : transaccion.proveedor;
+            
             let total = parseFloat(transaccion.total);
-            let cantidad = parseInt(transaccion.cantidad);
-            let precioUnitario = total / cantidad;
-            let subtotal = total / 1.16; // Asumiendo IVA del 16%
+            let subtotal = total / 1.16;
             let iva = total - subtotal;
 
+            // Manejo de compatibilidad (datos viejos vs datos nuevos con carrito)
+            let articulosHtml = "";
+            if (transaccion.articulos) {
+                articulosHtml = transaccion.articulos.map(a => `
+                    <tr>
+                        <td style="text-align: left; vertical-align: top; padding-top: 4px;">${a.cantidad}</td>
+                        <td style="text-align: left; vertical-align: top; padding-top: 4px; padding-right: 5px;">${a.producto}</td>
+                        <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${parseFloat(a.precio).toFixed(2)}</td>
+                        <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${parseFloat(a.subtotal).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            } else {
+                // Legado: Si solo había un producto en el registro
+                let pUnit = total / parseInt(transaccion.cantidad);
+                articulosHtml = `<tr>
+                    <td style="text-align: left; vertical-align: top; padding-top: 4px;">${transaccion.cantidad}</td>
+                    <td style="text-align: left; vertical-align: top; padding-top: 4px; padding-right: 5px;">${transaccion.producto}</td>
+                    <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${pUnit.toFixed(2)}</td>
+                    <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${total.toFixed(2)}</td>
+                </tr>`;
+            }
+
             let htmlTicket = `
-                <div style="width: 300px; margin: 0 auto; font-family: monospace; border: 1px dashed #000; padding: 20px;">
+                <div style="width: 320px; font-family: monospace; border: 1px dashed #000; padding: 20px;">
                     <h3 class="text-center" style="margin-bottom: 0;">SUPLEMENTOS PERRONES</h3>
                     <p class="text-center" style="font-size: 12px; margin-top: 5px;">Tu salud al máximo nivel</p>
                     <hr style="border-top: 1px dashed black;">
                     <p class="text-center"><b>TICKET DE ${tipo.toUpperCase()}</b></p>
                     <p style="font-size: 14px;">
+                        <b>Folio:</b> ${String(index + 1).padStart(4, '0')}<br>
                         <b>Fecha:</b> ${fechaHora}<br>
-                        <b>${tipo === 'Venta' ? 'Cliente' : 'Proveedor'}:</b> ${tipo === 'Venta' ? transaccion.cliente : transaccion.proveedor}
+                        <b>${tipo === 'Venta' ? 'Cliente' : 'Proveedor'}:</b> ${entidadText}
                         ${vendedorText}
                     </p>
                     <hr style="border-top: 1px dashed black;">
-                    
                     <table style="width: 100%; font-size: 14px; margin-bottom: 10px; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 1px solid black;">
                                 <th style="text-align: left; padding-bottom: 4px;">Cant</th>
-                                <th style="text-align: left; padding-bottom: 4px;">Descripción</th>
+                                <th style="text-align: left; padding-bottom: 4px;">Desc</th>
                                 <th style="text-align: right; padding-bottom: 4px;">P.Unit</th>
-                                <th style="text-align: right; padding-bottom: 4px;">Importe</th>
+                                <th style="text-align: right; padding-bottom: 4px;">Imp</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td style="text-align: left; vertical-align: top; padding-top: 4px;">${cantidad}</td>
-                                <td style="text-align: left; vertical-align: top; padding-top: 4px; padding-right: 5px;">${transaccion.producto}</td>
-                                <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${precioUnitario.toFixed(2)}</td>
-                                <td style="text-align: right; vertical-align: top; padding-top: 4px;">$${total.toFixed(2)}</td>
-                            </tr>
-                        </tbody>
+                        <tbody>${articulosHtml}</tbody>
                     </table>
-
                     <hr style="border-top: 1px dashed black;">
                     <div style="text-align: right; font-size: 14px;">
                         <p style="margin: 2px 0;"><b>Subtotal:</b> $${subtotal.toFixed(2)}</p>
@@ -408,14 +499,16 @@
                 </div>
             `;
 
-            let divTicket = document.getElementById('zonaTicket');
-            divTicket.innerHTML = htmlTicket;
-            divTicket.classList.remove('d-none');
-            window.print(); 
-            divTicket.classList.add('d-none'); 
+            // Inyectamos en el Modal y en la zona de impresión
+            document.getElementById('ticketModalBody').innerHTML = htmlTicket;
+            document.getElementById('zonaTicket').innerHTML = htmlTicket;
+            
+            // Mostramos el modal
+            let ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+            ticketModal.show();
         }
 
-        // NAVEGACIÓN Y CARGA INICIAL
+        // NAVEGACIÓN Y CARGA
         function cambiarSeccion(seccionActiva) {
             let secciones = ['inicio', 'productos', 'proveedores', 'clientes', 'compras', 'ventas'];
             secciones.forEach(sec => {
@@ -433,399 +526,247 @@
             refrescarUI();
         }
 
-        // ACTUALIZACIÓN DE UI
         function refrescarUI() {
             let ventas = JSON.parse(localStorage.getItem('bd_ventas')) || [];
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
             let clientes = JSON.parse(localStorage.getItem('bd_clientes')) || [];
+            let proveedores = JSON.parse(localStorage.getItem('bd_proveedores')) || [];
 
-            let ingresosTotales = ventas.reduce((acc, v) => acc + parseFloat(v.total), 0);
-            let totalStock = productos.reduce((acc, p) => acc + parseInt(p.stock), 0);
-
-            document.getElementById('dashIngresos').innerText = '$' + ingresosTotales.toFixed(2);
+            document.getElementById('dashIngresos').innerText = '$' + ventas.reduce((acc, v) => acc + parseFloat(v.total), 0).toFixed(2);
             document.getElementById('dashTotalVentas').innerText = ventas.length;
-            document.getElementById('dashStock').innerText = totalStock;
+            document.getElementById('dashStock').innerText = productos.reduce((acc, p) => acc + parseInt(p.stock), 0);
             document.getElementById('dashClientes').innerText = clientes.length;
 
-            let proveedores = JSON.parse(localStorage.getItem('bd_proveedores')) || [];
-            
-            let prodHTML = '<option value="">Selecciona Producto...</option>';
+            let prodHTML = '<option value="">(Selecciona)</option>';
             productos.forEach(p => prodHTML += `<option value="${p.nombre}">${p.nombre} (Disp: ${p.stock})</option>`);
             document.getElementById('compProd').innerHTML = prodHTML;
             document.getElementById('venProd').innerHTML = prodHTML;
 
-            let provHTML = '<option value="">Selecciona Proveedor...</option>';
+            let provHTML = '<option value="">(Selecciona Proveedor)</option>';
             proveedores.forEach(p => provHTML += `<option value="${p.nombre}">${p.nombre}</option>`);
-            document.getElementById('compProv').innerHTML = provHTML;
+            document.getElementById('compProvGlobal').innerHTML = provHTML;
 
-            let cliHTML = '<option value="">Selecciona Cliente...</option>';
+            let cliHTML = '<option value="">(Público General / Selecciona Cliente)</option>';
             clientes.forEach(c => cliHTML += `<option value="${c.nombre}">${c.nombre}</option>`);
-            document.getElementById('venCli').innerHTML = cliHTML;
+            document.getElementById('venCliGlobal').innerHTML = cliHTML;
         }
 
-        function cargarDatos(idTabla, nombreBD, funcionGeneradora) {
+        function cargarDatos(idTabla, nombreBD, funcGen) {
             let datos = JSON.parse(localStorage.getItem(nombreBD)) || [];
             let tabla = document.getElementById(idTabla);
             tabla.innerHTML = '';
-            datos.forEach((item, index) => {
-                tabla.innerHTML += funcionGeneradora(item, index, nombreBD, idTabla);
-            });
+            datos.forEach((item, index) => { tabla.innerHTML += funcGen(item, index, nombreBD, idTabla); });
         }
 
-        function eliminarDato(index, nombreBD, idTabla, funcionGeneradora) {
-            if(confirm("¿Estás seguro de eliminar este registro?")) {
+        function eliminarDato(index, nombreBD, idTabla, funcGen) {
+            if(confirm("¿Estás seguro de eliminar este registro permanentemente?")) {
                 let datos = JSON.parse(localStorage.getItem(nombreBD));
                 datos.splice(index, 1);
                 localStorage.setItem(nombreBD, JSON.stringify(datos));
-                cargarDatos(idTabla, nombreBD, funcionGeneradora);
+                cargarDatos(idTabla, nombreBD, funcGen);
                 refrescarUI();
             }
         }
-
-        function generarID(datos) {
-            return datos.length > 0 ? datos[datos.length - 1].id + 1 : 1;
-        }
+        function generarID(datos) { return datos.length > 0 ? datos[datos.length - 1].id + 1 : 1; }
 
         function actualizarStock(nombreProducto, cantidad, tipo) {
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
             let index = productos.findIndex(p => p.nombre.toLowerCase() === nombreProducto.toLowerCase());
-            
             if (index !== -1) {
-                let cantidadNumerica = parseInt(cantidad);
-                if (tipo === 'compra') productos[index].stock += cantidadNumerica; 
-                else if (tipo === 'venta') productos[index].stock -= cantidadNumerica; 
-                
+                if (tipo === 'compra') productos[index].stock += parseInt(cantidad); 
+                else if (tipo === 'venta') productos[index].stock -= parseInt(cantidad); 
                 localStorage.setItem('bd_productos', JSON.stringify(productos));
                 cargarDatos('tablaProductos', 'bd_productos', generarFilaProducto);
                 refrescarUI();
             }
         }
 
-        // ================= MODULO PRODUCTOS =================
+        // === MÓDULO PRODUCTOS ===
         function guardarProducto(e) {
             e.preventDefault();
             let datos = JSON.parse(localStorage.getItem('bd_productos')) || [];
             let idEdit = document.getElementById('prodIdHidden').value;
-
-            let productoAInsertar = { 
+            let p = { 
                 nombre: document.getElementById('prodNombre').value, 
                 categoria: document.getElementById('prodCategoria').value, 
                 descripcion: document.getElementById('prodDesc').value,
                 precio: document.getElementById('prodPrecio').value, 
                 stock: parseInt(document.getElementById('prodStock').value) || 0
             };
-
             if (idEdit !== "") {
-                // Modo Edición
-                let index = datos.findIndex(d => d.id == idEdit);
-                productoAInsertar.id = datos[index].id;
-                datos[index] = productoAInsertar;
+                let i = datos.findIndex(d => d.id == idEdit);
+                p.id = datos[i].id; datos[i] = p;
                 document.getElementById('btnGuardarProd').innerText = "Guardar Producto";
                 document.getElementById('prodIdHidden').value = "";
-            } else {
-                // Nuevo Producto
-                productoAInsertar.id = generarID(datos);
-                datos.push(productoAInsertar);
-            }
-
+            } else { p.id = generarID(datos); datos.push(p); }
             localStorage.setItem('bd_productos', JSON.stringify(datos));
             document.getElementById('formProducto').reset();
-            cargarDatos('tablaProductos', 'bd_productos', generarFilaProducto); 
-            refrescarUI();
+            cargarDatos('tablaProductos', 'bd_productos', generarFilaProducto); refrescarUI();
         }
-        
         function editarProducto(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_productos'));
-            let item = datos[i]; 
-            
+            let item = JSON.parse(localStorage.getItem('bd_productos'))[i]; 
             document.getElementById('prodIdHidden').value = item.id;
-            document.getElementById('prodNombre').value = item.nombre; 
-            document.getElementById('prodCategoria').value = item.categoria;
-            document.getElementById('prodDesc').value = item.descripcion; 
-            document.getElementById('prodPrecio').value = item.precio;
-            document.getElementById('prodStock').value = item.stock;
-            
+            ['prodNombre','prodCategoria','prodDesc','prodPrecio','prodStock'].forEach(id => {
+                document.getElementById(id).value = item[id.replace('prod', '').toLowerCase() || 'descripcion'];
+            });
+            document.getElementById('prodPrecio').value = item.precio; document.getElementById('prodStock').value = item.stock; document.getElementById('prodDesc').value = item.descripcion;
             document.getElementById('btnGuardarProd').innerText = "Actualizar Producto";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function generarFilaProducto(p, i, bd, tabla) {
-            let stockClase = p.stock <= 5 ? 'text-danger fw-bold' : 'text-success fw-bold';
-            return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.descripcion}</td><td>$${p.precio}</td><td class="${stockClase}">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
+            return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>$${p.precio}</td><td class="${p.stock<=5?'text-danger':'text-success'} fw-bold">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info fw-bold me-2" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
         }
 
-        // ================= MODULO PROVEEDORES =================
+        // === MÓDULO PROVEEDORES ===
         function guardarProveedor(e) {
             e.preventDefault();
             let datos = JSON.parse(localStorage.getItem('bd_proveedores')) || [];
             let idEdit = document.getElementById('provIdHidden').value;
-
-            let proveedorTemp = {
-                nombre: document.getElementById('provNombre').value, 
-                correo: document.getElementById('provCorreo').value, 
-                direccion: document.getElementById('provDir').value, 
-                contacto: document.getElementById('provContacto').value, 
-                rfc: document.getElementById('provRFC').value
-            };
-
-            if (idEdit !== "") {
-                let index = datos.findIndex(d => d.id == idEdit);
-                proveedorTemp.id = datos[index].id;
-                datos[index] = proveedorTemp;
-                document.getElementById('btnGuardarProv').innerText = "Guardar Proveedor";
-                document.getElementById('provIdHidden').value = "";
-            } else {
-                proveedorTemp.id = generarID(datos);
-                datos.push(proveedorTemp);
-            }
-
-            localStorage.setItem('bd_proveedores', JSON.stringify(datos));
-            document.getElementById('formProveedor').reset();
-            cargarDatos('tablaProveedores', 'bd_proveedores', generarFilaProveedor); 
-            refrescarUI();
+            let p = { nombre: document.getElementById('provNombre').value, correo: document.getElementById('provCorreo').value, direccion: document.getElementById('provDir').value, contacto: document.getElementById('provContacto').value, rfc: document.getElementById('provRFC').value };
+            if (idEdit !== "") { let i = datos.findIndex(d => d.id == idEdit); p.id = datos[i].id; datos[i] = p; document.getElementById('btnGuardarProv').innerText = "Guardar Proveedor"; document.getElementById('provIdHidden').value = ""; } 
+            else { p.id = generarID(datos); datos.push(p); }
+            localStorage.setItem('bd_proveedores', JSON.stringify(datos)); document.getElementById('formProveedor').reset(); cargarDatos('tablaProveedores', 'bd_proveedores', generarFilaProveedor); refrescarUI();
         }
+        function generarFilaProveedor(p, i, bd, tabla) { return `<tr><td>${p.nombre}</td><td>${p.correo}</td><td>${p.contacto}</td><td>${p.rfc||'-'}</td><td class="text-center"><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProveedor)">Borrar</button></td></tr>`; }
 
-        function editarProveedor(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_proveedores'));
-            let item = datos[i];
-            
-            document.getElementById('provIdHidden').value = item.id;
-            document.getElementById('provNombre').value = item.nombre; 
-            document.getElementById('provCorreo').value = item.correo;
-            document.getElementById('provDir').value = item.direccion; 
-            document.getElementById('provContacto').value = item.contacto;
-            document.getElementById('provRFC').value = item.rfc || '';
-
-            document.getElementById('btnGuardarProv').innerText = "Actualizar Proveedor";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function generarFilaProveedor(p, i, bd, tabla) {
-            return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.correo}</td><td>${p.direccion}</td><td>${p.contacto}</td><td>${p.rfc || 'N/A'}</td><td class="text-center"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarProveedor(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProveedor)">Borrar</button></td></tr>`;
-        }
-
-        // ================= MODULO CLIENTES =================
+        // === MÓDULO CLIENTES ===
         function guardarCliente(e) {
             e.preventDefault();
             let datos = JSON.parse(localStorage.getItem('bd_clientes')) || [];
             let idEdit = document.getElementById('cliIdHidden').value;
-
-            let cliTemp = {
-                nombre: document.getElementById('cliNombre').value, 
-                tel: document.getElementById('cliTel').value, 
-                correo: document.getElementById('cliCorreo').value
-            };
-
-            if (idEdit !== "") {
-                let index = datos.findIndex(d => d.id == idEdit);
-                cliTemp.id = datos[index].id;
-                datos[index] = cliTemp;
-                document.getElementById('btnGuardarCli').innerText = "Guardar Cliente";
-                document.getElementById('cliIdHidden').value = "";
-            } else {
-                cliTemp.id = generarID(datos);
-                datos.push(cliTemp);
-            }
-
-            localStorage.setItem('bd_clientes', JSON.stringify(datos));
-            document.getElementById('formCliente').reset();
-            cargarDatos('tablaClientes', 'bd_clientes', generarFilaCliente); 
-            refrescarUI();
+            let c = { nombre: document.getElementById('cliNombre').value, tel: document.getElementById('cliTel').value, correo: document.getElementById('cliCorreo').value };
+            if (idEdit !== "") { let i = datos.findIndex(d => d.id == idEdit); c.id = datos[i].id; datos[i] = c; document.getElementById('btnGuardarCli').innerText = "Guardar Cliente"; document.getElementById('cliIdHidden').value = ""; } 
+            else { c.id = generarID(datos); datos.push(c); }
+            localStorage.setItem('bd_clientes', JSON.stringify(datos)); document.getElementById('formCliente').reset(); cargarDatos('tablaClientes', 'bd_clientes', generarFilaCliente); refrescarUI();
         }
+        function generarFilaCliente(c, i, bd, tabla) { return `<tr><td>${c.nombre}</td><td>${c.tel}</td><td>${c.correo}</td><td class="text-center admin-only"><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaCliente)">Borrar</button></td></tr>`; }
 
-        function editarCliente(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_clientes'));
-            let item = datos[i];
-            
-            document.getElementById('cliIdHidden').value = item.id;
-            document.getElementById('cliNombre').value = item.nombre; 
-            document.getElementById('cliTel').value = item.tel;
-            document.getElementById('cliCorreo').value = item.correo;
-
-            document.getElementById('btnGuardarCli').innerText = "Actualizar Cliente";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function generarFilaCliente(c, i, bd, tabla) {
-            return `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.tel}</td><td>${c.correo}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarCliente(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaCliente)">Borrar</button></td></tr>`;
-        }
-
-        // ================= MODULO COMPRAS =================
-        function guardarCompra(e) {
+        // === MÓDULO COMPRAS (ENTRADAS) ===
+        function agregarAlCarritoCompra(e) {
             e.preventDefault();
-            let nombreProd = document.getElementById('compProd').value; 
-            let cantidad = parseInt(document.getElementById('compCant').value);
-            let totalAuto = document.getElementById('compTotal').value;
-            let indexEdit = document.getElementById('compIndexHidden').value;
-
+            let prod = document.getElementById('compProd').value;
+            let cant = parseInt(document.getElementById('compCant').value);
+            let precio = parseFloat(document.getElementById('compPrecio').value);
+            carritoCompras.push({ producto: prod, cantidad: cant, precio: precio, subtotal: cant * precio });
+            document.getElementById('formAgregarCompra').reset();
+            renderizarCarritoCompra();
+        }
+        function renderizarCarritoCompra() {
+            let tbody = document.getElementById('tablaCarritoCompra'); tbody.innerHTML = '';
+            let total = 0;
+            carritoCompras.forEach((item, i) => {
+                total += item.subtotal;
+                tbody.innerHTML += `<tr><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td>${item.cantidad}</td><td>$${item.subtotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger py-0" onclick="carritoCompras.splice(${i},1); renderizarCarritoCompra()">X</button></td></tr>`;
+            });
+            document.getElementById('compTotalGlobal').innerText = total.toFixed(2);
+        }
+        function finalizarCompra() {
+            if(carritoCompras.length === 0) return alert("El lote está vacío.");
+            let prov = document.getElementById('compProvGlobal').value || "Proveedor General";
             let datos = JSON.parse(localStorage.getItem('bd_compras')) || [];
             
-            let compTemp = { 
-                producto: nombreProd, 
-                proveedor: document.getElementById('compProv').value, 
-                cantidad: cantidad, 
-                total: totalAuto 
-            };
-
-            if (indexEdit !== "") {
-                // Revertir el stock de la compra original antes de aplicar el nuevo
-                actualizarStock(datos[indexEdit].producto, datos[indexEdit].cantidad, 'venta'); // Resta el stock anterior
-                datos[indexEdit] = compTemp;
-                document.getElementById('btnGuardarComp').innerText = "Registrar";
-                document.getElementById('compIndexHidden').value = "";
-            } else {
-                datos.push(compTemp);
-            }
-
+            datos.push({
+                fecha: new Date().toLocaleString('es-MX'), proveedor: prov, articulos: [...carritoCompras],
+                total: carritoCompras.reduce((acc, i) => acc + i.subtotal, 0)
+            });
             localStorage.setItem('bd_compras', JSON.stringify(datos));
-            actualizarStock(nombreProd, cantidad, 'compra'); // Suma el nuevo stock
+            carritoCompras.forEach(a => actualizarStock(a.producto, a.cantidad, 'compra'));
             
-            document.getElementById('formCompra').reset(); 
+            carritoCompras = []; renderizarCarritoCompra();
+            document.getElementById('compProvGlobal').value = '';
             cargarDatos('tablaCompras', 'bd_compras', generarFilaCompra);
+            mostrarTicket('Compra', datos.length - 1);
         }
-
         function borrarCompra(i) {
-            if(confirm("¿Seguro que deseas eliminar esta compra? El stock se reducirá.")) {
+            if(confirm("¿Eliminar compra? Se restará el stock de los productos involucrados.")) {
                 let datos = JSON.parse(localStorage.getItem('bd_compras'));
-                actualizarStock(datos[i].producto, datos[i].cantidad, 'venta'); // Revertimos sumando "como si fuera venta" (resta)
-                datos.splice(i, 1);
-                localStorage.setItem('bd_compras', JSON.stringify(datos));
-                cargarDatos('tablaCompras', 'bd_compras', generarFilaCompra);
-                refrescarUI();
+                let item = datos[i];
+                if(item.articulos) { item.articulos.forEach(a => actualizarStock(a.producto, a.cantidad, 'venta')); } // revierte
+                else { actualizarStock(item.producto, item.cantidad, 'venta'); }
+                datos.splice(i, 1); localStorage.setItem('bd_compras', JSON.stringify(datos));
+                cargarDatos('tablaCompras', 'bd_compras', generarFilaCompra); refrescarUI();
             }
         }
-
-        function editarCompra(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_compras'));
-            let item = datos[i];
-            
-            document.getElementById('compIndexHidden').value = i;
-            document.getElementById('compProd').value = item.producto; 
-            document.getElementById('compProv').value = item.proveedor;
-            document.getElementById('compPrecio').value = (item.total / item.cantidad).toFixed(2);
-            document.getElementById('compCant').value = item.cantidad; 
-            document.getElementById('compTotal').value = item.total;
-            
-            document.getElementById('btnGuardarComp').innerText = "Actualizar Compra";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
         function generarFilaCompra(c, i, bd, tabla) {
-            return `<tr><td>${c.producto}</td><td>${c.proveedor}</td><td>${c.cantidad}</td><td>$${c.total}</td><td class="text-center">
-                <button class="btn btn-sm btn-light fw-bold me-2" onclick="imprimirTicket('Compra', ${i})">Ticket</button>
-                <button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarCompra(${i})">Editar</button>
+            let arts = c.articulos ? c.articulos.map(a => `${a.cantidad}x ${a.producto}`).join('<br>') : c.producto;
+            return `<tr><td>${c.fecha||'N/A'}</td><td>${c.proveedor}</td><td style="font-size:12px;">${arts}</td><td>$${parseFloat(c.total).toFixed(2)}</td><td class="text-center">
+                <button class="btn btn-sm btn-light fw-bold me-1" onclick="mostrarTicket('Compra', ${i})">Ticket</button>
                 <button class="btn btn-sm btn-danger fw-bold" onclick="borrarCompra(${i})">Borrar</button>
             </td></tr>`;
         }
 
-        // ================= MODULO VENTAS =================
-        function guardarVenta(e) {
-            e.preventDefault();
-            let nombreProd = document.getElementById('venProd').value; 
-            let cantidad = parseInt(document.getElementById('venCant').value);
-            let totalAuto = document.getElementById('venTotal').value;
-            let indexEdit = document.getElementById('venIndexHidden').value;
-
+        // === MÓDULO VENTAS ===
+        function actualizarPrecioVenta() {
+            let prod = document.getElementById('venProd').value;
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
-            let prodSeleccionado = productos.find(p => p.nombre === nombreProd);
+            let found = productos.find(p => p.nombre === prod);
+            document.getElementById('venPrecio').value = found ? found.precio : '';
+        }
+        function agregarAlCarritoVenta(e) {
+            e.preventDefault();
+            let prod = document.getElementById('venProd').value;
+            let cant = parseInt(document.getElementById('venCant').value);
+            let precio = parseFloat(document.getElementById('venPrecio').value);
             
+            // Validar Stock
+            let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
+            let pDB = productos.find(p => p.nombre === prod);
+            let enCarrito = carritoVentas.filter(i => i.producto === prod).reduce((acc, i) => acc + i.cantidad, 0);
+            
+            if (!pDB || (cant + enCarrito) > pDB.stock) {
+                alert(`⚠️ Stock insuficiente. Solo hay ${pDB ? pDB.stock - enCarrito : 0} disponibles.`); return;
+            }
+
+            carritoVentas.push({ producto: prod, cantidad: cant, precio: precio, subtotal: cant * precio });
+            document.getElementById('formAgregarVenta').reset();
+            renderizarCarritoVenta();
+        }
+        function renderizarCarritoVenta() {
+            let tbody = document.getElementById('tablaCarritoVenta'); tbody.innerHTML = '';
+            let total = 0;
+            carritoVentas.forEach((item, i) => {
+                total += item.subtotal;
+                tbody.innerHTML += `<tr><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td>${item.cantidad}</td><td>$${item.subtotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger py-0" onclick="carritoVentas.splice(${i},1); renderizarCarritoVenta()">X</button></td></tr>`;
+            });
+            document.getElementById('venTotalGlobal').innerText = total.toFixed(2);
+        }
+        function finalizarVenta() {
+            if(carritoVentas.length === 0) return alert("El carrito está vacío.");
+            let cliente = document.getElementById('venCliGlobal').value || "Público General";
             let datos = JSON.parse(localStorage.getItem('bd_ventas')) || [];
             
-            // Si estamos editando, devolvemos temporalmente el stock original para calcular si hay suficiente
-            let stockDisponible = prodSeleccionado ? prodSeleccionado.stock : 0;
-            if (indexEdit !== "") {
-                if (datos[indexEdit].producto === nombreProd) {
-                    stockDisponible += parseInt(datos[indexEdit].cantidad);
-                }
-            }
-
-            if (!prodSeleccionado || cantidad > stockDisponible) {
-                alert(`⚠️ Error: Stock insuficiente. Tienes ${stockDisponible} unidades disponibles.`); 
-                return;
-            }
-
-            let vendedorActual = localStorage.getItem('sesion_suplementos');
-            let fechaActual = new Date().toLocaleString('es-MX');
-
-            let ventaTemp = { 
-                fecha: indexEdit !== "" ? datos[indexEdit].fecha : fechaActual,
-                vendedor: vendedorActual,
-                producto: nombreProd, 
-                cliente: document.getElementById('venCli').value, 
-                cantidad: cantidad, 
-                total: totalAuto 
-            };
-
-            if (indexEdit !== "") {
-                actualizarStock(datos[indexEdit].producto, datos[indexEdit].cantidad, 'compra'); // Devuelve el stock original
-                datos[indexEdit] = ventaTemp;
-                document.getElementById('btnGuardarVen').innerText = "Registrar";
-                document.getElementById('venIndexHidden').value = "";
-            } else {
-                datos.push(ventaTemp);
-            }
-
+            datos.push({
+                fecha: new Date().toLocaleString('es-MX'), vendedor: localStorage.getItem('sesion_suplementos'),
+                cliente: cliente, articulos: [...carritoVentas], total: carritoVentas.reduce((acc, i) => acc + i.subtotal, 0)
+            });
             localStorage.setItem('bd_ventas', JSON.stringify(datos));
-            actualizarStock(nombreProd, cantidad, 'venta'); // Resta el nuevo stock
+            carritoVentas.forEach(a => actualizarStock(a.producto, a.cantidad, 'venta'));
             
-            document.getElementById('formVenta').reset(); 
+            carritoVentas = []; renderizarCarritoVenta();
+            document.getElementById('venCliGlobal').value = '';
             cargarDatos('tablaVentas', 'bd_ventas', generarFilaVenta);
-            
-            if(indexEdit === "" && confirm("Venta registrada con éxito. ¿Deseas imprimir el ticket ahora?")) {
-                imprimirTicket('Venta', datos.length - 1);
-            }
+            mostrarTicket('Venta', datos.length - 1);
         }
-
         function borrarVenta(i) {
-            if(confirm("¿Seguro que deseas eliminar esta venta? El producto regresará al inventario.")) {
+            if(confirm("¿Eliminar venta? Los artículos regresarán al inventario.")) {
                 let datos = JSON.parse(localStorage.getItem('bd_ventas'));
-                actualizarStock(datos[i].producto, datos[i].cantidad, 'compra'); // Devuelve al inventario
-                datos.splice(i, 1);
-                localStorage.setItem('bd_ventas', JSON.stringify(datos));
-                cargarDatos('tablaVentas', 'bd_ventas', generarFilaVenta);
-                refrescarUI();
+                let item = datos[i];
+                if(item.articulos) { item.articulos.forEach(a => actualizarStock(a.producto, a.cantidad, 'compra')); } // revierte
+                else { actualizarStock(item.producto, item.cantidad, 'compra'); }
+                datos.splice(i, 1); localStorage.setItem('bd_ventas', JSON.stringify(datos));
+                cargarDatos('tablaVentas', 'bd_ventas', generarFilaVenta); refrescarUI();
             }
         }
-
-        function editarVenta(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_ventas'));
-            let item = datos[i];
-            
-            document.getElementById('venIndexHidden').value = i;
-            document.getElementById('venProd').value = item.producto; 
-            document.getElementById('venCli').value = item.cliente;
-            document.getElementById('venPrecio').value = (item.total / item.cantidad).toFixed(2);
-            document.getElementById('venCant').value = item.cantidad; 
-            document.getElementById('venTotal').value = item.total;
-            
-            document.getElementById('btnGuardarVen').innerText = "Actualizar Venta";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
         function generarFilaVenta(v, i, bd, tabla) {
             let currentUser = localStorage.getItem('sesion_suplementos');
             let isAdmin = (credenciales[currentUser] && credenciales[currentUser].rol === 'admin');
-            
-            if (!isAdmin && v.vendedor !== currentUser) {
-                return ''; 
-            }
+            if (!isAdmin && v.vendedor !== currentUser) return ''; 
 
-            let fechaStr = v.fecha ? v.fecha : 'N/A';
-            let vendedorStr = v.vendedor ? v.vendedor : 'N/A';
-
-            return `<tr>
-                <td>${fechaStr}</td>
-                <td class="admin-only text-warning fw-bold">${vendedorStr}</td>
-                <td>${v.producto}</td>
-                <td>${v.cliente}</td>
-                <td>${v.cantidad}</td>
-                <td>$${v.total}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-light text-dark fw-bold me-2" onclick="imprimirTicket('Venta', ${i})">Ticket</button>
-                    <button class="btn btn-sm btn-info text-dark fw-bold me-2 admin-only" onclick="editarVenta(${i})">Editar</button>
-                    <button class="btn btn-sm btn-danger fw-bold admin-only" onclick="borrarVenta(${i})">Borrar</button>
-                </td>
-            </tr>`;
+            let arts = v.articulos ? v.articulos.map(a => `${a.cantidad}x ${a.producto}`).join('<br>') : v.producto;
+            return `<tr><td>${v.fecha||'N/A'}</td><td class="admin-only text-warning fw-bold">${v.vendedor||'N/A'}</td><td>${v.cliente}</td><td style="font-size:12px;">${arts}</td><td>$${parseFloat(v.total).toFixed(2)}</td><td class="text-center">
+                <button class="btn btn-sm btn-light fw-bold me-1 text-dark" onclick="mostrarTicket('Venta', ${i})">Ticket</button>
+                <button class="btn btn-sm btn-danger fw-bold admin-only" onclick="borrarVenta(${i})">Borrar</button>
+            </td></tr>`;
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
