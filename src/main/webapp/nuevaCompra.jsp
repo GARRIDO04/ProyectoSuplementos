@@ -16,7 +16,7 @@
 
     <div class="container-fluid p-4">
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
-            <h2 class="fw-bold text-success text-uppercase m-0">📦 MÓDULO DE COMPRAS (SURTIDO)</h2>
+            <h2 class="fw-bold text-success text-uppercase m-0">📦 MÓDULO DE COMPRAS</h2>
             <div>
                 <a href="index.jsp" class="btn btn-outline-light me-2">Volver al Panel</a>
             </div>

@@ -129,6 +129,7 @@
                 <div class="card bg-secondary text-light shadow mb-4 admin-only"> 
                     <div class="card-body">
                         <form id="formProducto" onsubmit="guardarProducto(event)">
+                            <input type="hidden" id="prodIdHidden" value="">
                             <div class="row g-3 mb-3">
                                 <div class="col-md-4"><input type="text" id="prodNombre" class="form-control" placeholder="Nombre del Producto" required></div>
                                 <div class="col-md-4"><input type="text" id="prodCategoria" class="form-control" placeholder="Categoría" required></div>
@@ -137,7 +138,7 @@
                             <div class="row g-3">
                                 <div class="col-md-4"><input type="number" step="0.01" id="prodPrecio" class="form-control" placeholder="Precio de Venta $" required></div>
                                 <div class="col-md-4"><input type="number" id="prodStock" class="form-control" placeholder="Stock Inicial" required></div>
-                                <div class="col-md-4"><button type="submit" class="btn btn-warning w-100 fw-bold">Guardar Producto</button></div>
+                                <div class="col-md-4"><button type="submit" id="btnGuardarProd" class="btn btn-warning w-100 fw-bold">Guardar Producto</button></div>
                             </div>
                         </form>
                     </div>
@@ -153,6 +154,7 @@
                 <div class="card bg-secondary text-light shadow mb-4">
                     <div class="card-body">
                         <form id="formProveedor" onsubmit="guardarProveedor(event)">
+                            <input type="hidden" id="provIdHidden" value="">
                             <div class="row g-3 mb-3">
                                 <div class="col-md-4"><input type="text" id="provNombre" class="form-control" placeholder="Nombre" required></div>
                                 <div class="col-md-4"><input type="email" id="provCorreo" class="form-control" placeholder="Correo Electrónico" required></div>
@@ -161,7 +163,7 @@
                             <div class="row g-3">
                                 <div class="col-md-4"><input type="text" id="provContacto" class="form-control" placeholder="Persona de Contacto" required></div>
                                 <div class="col-md-4"><input type="text" id="provRFC" class="form-control" placeholder="RFC"></div>
-                                <div class="col-md-4"><button type="submit" class="btn btn-warning w-100 fw-bold">Guardar Proveedor</button></div>
+                                <div class="col-md-4"><button type="submit" id="btnGuardarProv" class="btn btn-warning w-100 fw-bold">Guardar Proveedor</button></div>
                             </div>
                         </form>
                     </div>
@@ -177,13 +179,14 @@
                 <div class="card bg-secondary text-light shadow mb-4">
                     <div class="card-body">
                         <form id="formCliente" onsubmit="guardarCliente(event)">
+                            <input type="hidden" id="cliIdHidden" value="">
                             <div class="row g-3 mb-3">
                                 <div class="col-md-4"><input type="text" id="cliNombre" class="form-control" placeholder="Nombre del Cliente" required></div>
                                 <div class="col-md-4"><input type="text" id="cliTel" class="form-control" placeholder="Teléfono" required></div>
                                 <div class="col-md-4"><input type="email" id="cliCorreo" class="form-control" placeholder="Correo" required></div>
                             </div>
                             <div class="row g-3">
-                                <div class="col-md-12"><button type="submit" class="btn btn-warning w-100 fw-bold">Guardar Cliente</button></div>
+                                <div class="col-md-12"><button type="submit" id="btnGuardarCli" class="btn btn-warning w-100 fw-bold">Guardar Cliente</button></div>
                             </div>
                         </form>
                     </div>
@@ -199,6 +202,7 @@
                 <div class="card bg-secondary text-light shadow mb-4">
                     <div class="card-body">
                         <form id="formCompra" onsubmit="guardarCompra(event)">
+                            <input type="hidden" id="compIndexHidden" value="">
                             <div class="row g-3">
                                 <div class="col-md-2">
                                     <select id="compProd" class="form-select" required></select>
@@ -216,7 +220,7 @@
                                     <input type="number" step="0.01" id="compTotal" class="form-control bg-dark text-white" placeholder="Total $" readonly required>
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-info w-100 fw-bold">Registrar</button>
+                                    <button type="submit" id="btnGuardarComp" class="btn btn-info w-100 fw-bold">Registrar</button>
                                 </div>
                             </div>
                         </form>
@@ -233,6 +237,7 @@
                 <div class="card bg-secondary text-light shadow mb-4">
                     <div class="card-body">
                         <form id="formVenta" onsubmit="guardarVenta(event)">
+                            <input type="hidden" id="venIndexHidden" value="">
                             <div class="row g-3">
                                 <div class="col-md-2">
                                     <select id="venProd" class="form-select" onchange="actualizarPrecioVenta()" required></select>
@@ -250,7 +255,7 @@
                                     <input type="number" step="0.01" id="venTotal" class="form-control bg-dark text-white" placeholder="Total $" readonly required>
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success w-100 fw-bold">Registrar</button>
+                                    <button type="submit" id="btnGuardarVen" class="btn btn-success w-100 fw-bold">Registrar</button>
                                 </div>
                             </div>
                         </form>
@@ -290,7 +295,6 @@
             let cantidad = parseInt(document.getElementById('compCant').value) || 0;
             document.getElementById('compTotal').value = (precio * cantidad).toFixed(2);
         }
-
 
         // SISTEMA DE LOGIN Y SESIONES
         const credenciales = {
@@ -349,6 +353,8 @@
             let bd = tipo === 'Venta' ? 'bd_ventas' : 'bd_compras';
             let datos = JSON.parse(localStorage.getItem(bd)) || [];
             let transaccion = datos[index];
+            if (!transaccion) return;
+
             let fechaHora = transaccion.fecha || new Date().toLocaleString('es-MX');
             let vendedorText = tipo === 'Venta' && transaccion.vendedor ? `<br><b>Le atendió:</b> ${transaccion.vendedor}` : '';
 
@@ -409,7 +415,7 @@
             divTicket.classList.add('d-none'); 
         }
 
-        // <<<<<<NAVEGACIÓN Y CARGA INICIAL<<<<<
+        // NAVEGACIÓN Y CARGA INICIAL
         function cambiarSeccion(seccionActiva) {
             let secciones = ['inicio', 'productos', 'proveedores', 'clientes', 'compras', 'ventas'];
             secciones.forEach(sec => {
@@ -427,7 +433,7 @@
             refrescarUI();
         }
 
-        // --- ACTUALIZACIÓN ---
+        // ACTUALIZACIÓN DE UI
         function refrescarUI() {
             let ventas = JSON.parse(localStorage.getItem('bd_ventas')) || [];
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
@@ -437,7 +443,7 @@
             let totalStock = productos.reduce((acc, p) => acc + parseInt(p.stock), 0);
 
             document.getElementById('dashIngresos').innerText = '$' + ingresosTotales.toFixed(2);
-            document.getElementById('dashTotalVentas').innerText = ventas.length; // Actualiza número de ventas
+            document.getElementById('dashTotalVentas').innerText = ventas.length;
             document.getElementById('dashStock').innerText = totalStock;
             document.getElementById('dashClientes').innerText = clientes.length;
 
@@ -467,11 +473,13 @@
         }
 
         function eliminarDato(index, nombreBD, idTabla, funcionGeneradora) {
-            let datos = JSON.parse(localStorage.getItem(nombreBD));
-            datos.splice(index, 1);
-            localStorage.setItem(nombreBD, JSON.stringify(datos));
-            cargarDatos(idTabla, nombreBD, funcionGeneradora);
-            refrescarUI();
+            if(confirm("¿Estás seguro de eliminar este registro?")) {
+                let datos = JSON.parse(localStorage.getItem(nombreBD));
+                datos.splice(index, 1);
+                localStorage.setItem(nombreBD, JSON.stringify(datos));
+                cargarDatos(idTabla, nombreBD, funcionGeneradora);
+                refrescarUI();
+            }
         }
 
         function generarID(datos) {
@@ -493,117 +501,215 @@
             }
         }
 
-        // MODULOS
-
+        // ================= MODULO PRODUCTOS =================
         function guardarProducto(e) {
             e.preventDefault();
             let datos = JSON.parse(localStorage.getItem('bd_productos')) || [];
-            datos.push({ 
-                id: generarID(datos), nombre: document.getElementById('prodNombre').value, 
-                categoria: document.getElementById('prodCategoria').value, descripcion: document.getElementById('prodDesc').value,
-                precio: document.getElementById('prodPrecio').value, stock: parseInt(document.getElementById('prodStock').value) || 0
-            });
+            let idEdit = document.getElementById('prodIdHidden').value;
+
+            let productoAInsertar = { 
+                nombre: document.getElementById('prodNombre').value, 
+                categoria: document.getElementById('prodCategoria').value, 
+                descripcion: document.getElementById('prodDesc').value,
+                precio: document.getElementById('prodPrecio').value, 
+                stock: parseInt(document.getElementById('prodStock').value) || 0
+            };
+
+            if (idEdit !== "") {
+                // Modo Edición
+                let index = datos.findIndex(d => d.id == idEdit);
+                productoAInsertar.id = datos[index].id;
+                datos[index] = productoAInsertar;
+                document.getElementById('btnGuardarProd').innerText = "Guardar Producto";
+                document.getElementById('prodIdHidden').value = "";
+            } else {
+                // Nuevo Producto
+                productoAInsertar.id = generarID(datos);
+                datos.push(productoAInsertar);
+            }
+
             localStorage.setItem('bd_productos', JSON.stringify(datos));
             document.getElementById('formProducto').reset();
-            cargarDatos('tablaProductos', 'bd_productos', generarFilaProducto); refrescarUI();
+            cargarDatos('tablaProductos', 'bd_productos', generarFilaProducto); 
+            refrescarUI();
         }
         
         function editarProducto(i) {
             let datos = JSON.parse(localStorage.getItem('bd_productos'));
-            let item = datos[i]; // Guarda la información temporalmente
-            eliminarDato(i, 'bd_productos', 'tablaProductos', generarFilaProducto); // Borra primero
+            let item = datos[i]; 
             
-            // Llena el formulario DESPUÉS de borrar, así no se pierde al actualizar
+            document.getElementById('prodIdHidden').value = item.id;
             document.getElementById('prodNombre').value = item.nombre; 
             document.getElementById('prodCategoria').value = item.categoria;
             document.getElementById('prodDesc').value = item.descripcion; 
             document.getElementById('prodPrecio').value = item.precio;
             document.getElementById('prodStock').value = item.stock;
             
+            document.getElementById('btnGuardarProd').innerText = "Actualizar Producto";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function generarFilaProducto(p, i, bd, tabla) {
             let stockClase = p.stock <= 5 ? 'text-danger fw-bold' : 'text-success fw-bold';
             return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.descripcion}</td><td>$${p.precio}</td><td class="${stockClase}">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
         }
 
+        // ================= MODULO PROVEEDORES =================
         function guardarProveedor(e) {
             e.preventDefault();
             let datos = JSON.parse(localStorage.getItem('bd_proveedores')) || [];
-            datos.push({ id: generarID(datos), nombre: document.getElementById('provNombre').value, correo: document.getElementById('provCorreo').value, direccion: document.getElementById('provDir').value, contacto: document.getElementById('provContacto').value, rfc: document.getElementById('provRFC').value });
+            let idEdit = document.getElementById('provIdHidden').value;
+
+            let proveedorTemp = {
+                nombre: document.getElementById('provNombre').value, 
+                correo: document.getElementById('provCorreo').value, 
+                direccion: document.getElementById('provDir').value, 
+                contacto: document.getElementById('provContacto').value, 
+                rfc: document.getElementById('provRFC').value
+            };
+
+            if (idEdit !== "") {
+                let index = datos.findIndex(d => d.id == idEdit);
+                proveedorTemp.id = datos[index].id;
+                datos[index] = proveedorTemp;
+                document.getElementById('btnGuardarProv').innerText = "Guardar Proveedor";
+                document.getElementById('provIdHidden').value = "";
+            } else {
+                proveedorTemp.id = generarID(datos);
+                datos.push(proveedorTemp);
+            }
+
             localStorage.setItem('bd_proveedores', JSON.stringify(datos));
             document.getElementById('formProveedor').reset();
-            cargarDatos('tablaProveedores', 'bd_proveedores', generarFilaProveedor); refrescarUI();
+            cargarDatos('tablaProveedores', 'bd_proveedores', generarFilaProveedor); 
+            refrescarUI();
         }
+
         function editarProveedor(i) {
             let datos = JSON.parse(localStorage.getItem('bd_proveedores'));
             let item = datos[i];
-            eliminarDato(i, 'bd_proveedores', 'tablaProveedores', generarFilaProveedor);
-
+            
+            document.getElementById('provIdHidden').value = item.id;
             document.getElementById('provNombre').value = item.nombre; 
             document.getElementById('provCorreo').value = item.correo;
             document.getElementById('provDir').value = item.direccion; 
             document.getElementById('provContacto').value = item.contacto;
             document.getElementById('provRFC').value = item.rfc || '';
+
+            document.getElementById('btnGuardarProv').innerText = "Actualizar Proveedor";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function generarFilaProveedor(p, i, bd, tabla) {
             return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.correo}</td><td>${p.direccion}</td><td>${p.contacto}</td><td>${p.rfc || 'N/A'}</td><td class="text-center"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarProveedor(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProveedor)">Borrar</button></td></tr>`;
         }
 
+        // ================= MODULO CLIENTES =================
         function guardarCliente(e) {
             e.preventDefault();
             let datos = JSON.parse(localStorage.getItem('bd_clientes')) || [];
-            datos.push({ id: generarID(datos), nombre: document.getElementById('cliNombre').value, tel: document.getElementById('cliTel').value, correo: document.getElementById('cliCorreo').value });
+            let idEdit = document.getElementById('cliIdHidden').value;
+
+            let cliTemp = {
+                nombre: document.getElementById('cliNombre').value, 
+                tel: document.getElementById('cliTel').value, 
+                correo: document.getElementById('cliCorreo').value
+            };
+
+            if (idEdit !== "") {
+                let index = datos.findIndex(d => d.id == idEdit);
+                cliTemp.id = datos[index].id;
+                datos[index] = cliTemp;
+                document.getElementById('btnGuardarCli').innerText = "Guardar Cliente";
+                document.getElementById('cliIdHidden').value = "";
+            } else {
+                cliTemp.id = generarID(datos);
+                datos.push(cliTemp);
+            }
+
             localStorage.setItem('bd_clientes', JSON.stringify(datos));
             document.getElementById('formCliente').reset();
-            cargarDatos('tablaClientes', 'bd_clientes', generarFilaCliente); refrescarUI();
+            cargarDatos('tablaClientes', 'bd_clientes', generarFilaCliente); 
+            refrescarUI();
         }
+
         function editarCliente(i) {
             let datos = JSON.parse(localStorage.getItem('bd_clientes'));
             let item = datos[i];
-            eliminarDato(i, 'bd_clientes', 'tablaClientes', generarFilaCliente);
-
+            
+            document.getElementById('cliIdHidden').value = item.id;
             document.getElementById('cliNombre').value = item.nombre; 
             document.getElementById('cliTel').value = item.tel;
             document.getElementById('cliCorreo').value = item.correo;
+
+            document.getElementById('btnGuardarCli').innerText = "Actualizar Cliente";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function generarFilaCliente(c, i, bd, tabla) {
             return `<tr><td>${c.id}</td><td>${c.nombre}</td><td>${c.tel}</td><td>${c.correo}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info text-dark fw-bold me-2" onclick="editarCliente(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaCliente)">Borrar</button></td></tr>`;
         }
 
+        // ================= MODULO COMPRAS =================
         function guardarCompra(e) {
             e.preventDefault();
             let nombreProd = document.getElementById('compProd').value; 
             let cantidad = parseInt(document.getElementById('compCant').value);
             let totalAuto = document.getElementById('compTotal').value;
+            let indexEdit = document.getElementById('compIndexHidden').value;
 
             let datos = JSON.parse(localStorage.getItem('bd_compras')) || [];
-            datos.push({ producto: nombreProd, proveedor: document.getElementById('compProv').value, cantidad: cantidad, total: totalAuto });
-            localStorage.setItem('bd_compras', JSON.stringify(datos));
             
-            actualizarStock(nombreProd, cantidad, 'compra');
+            let compTemp = { 
+                producto: nombreProd, 
+                proveedor: document.getElementById('compProv').value, 
+                cantidad: cantidad, 
+                total: totalAuto 
+            };
+
+            if (indexEdit !== "") {
+                // Revertir el stock de la compra original antes de aplicar el nuevo
+                actualizarStock(datos[indexEdit].producto, datos[indexEdit].cantidad, 'venta'); // Resta el stock anterior
+                datos[indexEdit] = compTemp;
+                document.getElementById('btnGuardarComp').innerText = "Registrar";
+                document.getElementById('compIndexHidden').value = "";
+            } else {
+                datos.push(compTemp);
+            }
+
+            localStorage.setItem('bd_compras', JSON.stringify(datos));
+            actualizarStock(nombreProd, cantidad, 'compra'); // Suma el nuevo stock
+            
             document.getElementById('formCompra').reset(); 
             cargarDatos('tablaCompras', 'bd_compras', generarFilaCompra);
         }
+
         function borrarCompra(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_compras'));
-            actualizarStock(datos[i].producto, datos[i].cantidad, 'venta');
-            eliminarDato(i, 'bd_compras', 'tablaCompras', generarFilaCompra);
+            if(confirm("¿Seguro que deseas eliminar esta compra? El stock se reducirá.")) {
+                let datos = JSON.parse(localStorage.getItem('bd_compras'));
+                actualizarStock(datos[i].producto, datos[i].cantidad, 'venta'); // Revertimos sumando "como si fuera venta" (resta)
+                datos.splice(i, 1);
+                localStorage.setItem('bd_compras', JSON.stringify(datos));
+                cargarDatos('tablaCompras', 'bd_compras', generarFilaCompra);
+                refrescarUI();
+            }
         }
+
         function editarCompra(i) {
             let datos = JSON.parse(localStorage.getItem('bd_compras'));
             let item = datos[i];
-            borrarCompra(i);
-
+            
+            document.getElementById('compIndexHidden').value = i;
             document.getElementById('compProd').value = item.producto; 
             document.getElementById('compProv').value = item.proveedor;
             document.getElementById('compPrecio').value = (item.total / item.cantidad).toFixed(2);
             document.getElementById('compCant').value = item.cantidad; 
             document.getElementById('compTotal').value = item.total;
+            
+            document.getElementById('btnGuardarComp').innerText = "Actualizar Compra";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function generarFilaCompra(c, i, bd, tabla) {
             return `<tr><td>${c.producto}</td><td>${c.proveedor}</td><td>${c.cantidad}</td><td>$${c.total}</td><td class="text-center">
                 <button class="btn btn-sm btn-light fw-bold me-2" onclick="imprimirTicket('Compra', ${i})">Ticket</button>
@@ -612,61 +718,90 @@
             </td></tr>`;
         }
 
-        // --- AUDITORÍA Y REGISTRO DE VENTAS ---
+        // ================= MODULO VENTAS =================
         function guardarVenta(e) {
             e.preventDefault();
             let nombreProd = document.getElementById('venProd').value; 
             let cantidad = parseInt(document.getElementById('venCant').value);
             let totalAuto = document.getElementById('venTotal').value;
+            let indexEdit = document.getElementById('venIndexHidden').value;
 
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
             let prodSeleccionado = productos.find(p => p.nombre === nombreProd);
             
-            if (!prodSeleccionado || cantidad > prodSeleccionado.stock) {
-                alert(`⚠️ Error: Stock insuficiente. Tienes ${prodSeleccionado ? prodSeleccionado.stock : 0} unidades disponibles.`); return;
+            let datos = JSON.parse(localStorage.getItem('bd_ventas')) || [];
+            
+            // Si estamos editando, devolvemos temporalmente el stock original para calcular si hay suficiente
+            let stockDisponible = prodSeleccionado ? prodSeleccionado.stock : 0;
+            if (indexEdit !== "") {
+                if (datos[indexEdit].producto === nombreProd) {
+                    stockDisponible += parseInt(datos[indexEdit].cantidad);
+                }
+            }
+
+            if (!prodSeleccionado || cantidad > stockDisponible) {
+                alert(`⚠️ Error: Stock insuficiente. Tienes ${stockDisponible} unidades disponibles.`); 
+                return;
             }
 
             let vendedorActual = localStorage.getItem('sesion_suplementos');
             let fechaActual = new Date().toLocaleString('es-MX');
 
-            let datos = JSON.parse(localStorage.getItem('bd_ventas')) || [];
-            datos.push({ 
-                fecha: fechaActual,
+            let ventaTemp = { 
+                fecha: indexEdit !== "" ? datos[indexEdit].fecha : fechaActual,
                 vendedor: vendedorActual,
                 producto: nombreProd, 
                 cliente: document.getElementById('venCli').value, 
                 cantidad: cantidad, 
                 total: totalAuto 
-            });
+            };
+
+            if (indexEdit !== "") {
+                actualizarStock(datos[indexEdit].producto, datos[indexEdit].cantidad, 'compra'); // Devuelve el stock original
+                datos[indexEdit] = ventaTemp;
+                document.getElementById('btnGuardarVen').innerText = "Registrar";
+                document.getElementById('venIndexHidden').value = "";
+            } else {
+                datos.push(ventaTemp);
+            }
+
             localStorage.setItem('bd_ventas', JSON.stringify(datos));
+            actualizarStock(nombreProd, cantidad, 'venta'); // Resta el nuevo stock
             
-            actualizarStock(nombreProd, cantidad, 'venta');
             document.getElementById('formVenta').reset(); 
             cargarDatos('tablaVentas', 'bd_ventas', generarFilaVenta);
             
-            if(confirm("Venta registrada con éxito. ¿Deseas imprimir el ticket ahora?")) {
+            if(indexEdit === "" && confirm("Venta registrada con éxito. ¿Deseas imprimir el ticket ahora?")) {
                 imprimirTicket('Venta', datos.length - 1);
             }
         }
+
         function borrarVenta(i) {
-            let datos = JSON.parse(localStorage.getItem('bd_ventas'));
-            actualizarStock(datos[i].producto, datos[i].cantidad, 'compra');
-            eliminarDato(i, 'bd_ventas', 'tablaVentas', generarFilaVenta);
+            if(confirm("¿Seguro que deseas eliminar esta venta? El producto regresará al inventario.")) {
+                let datos = JSON.parse(localStorage.getItem('bd_ventas'));
+                actualizarStock(datos[i].producto, datos[i].cantidad, 'compra'); // Devuelve al inventario
+                datos.splice(i, 1);
+                localStorage.setItem('bd_ventas', JSON.stringify(datos));
+                cargarDatos('tablaVentas', 'bd_ventas', generarFilaVenta);
+                refrescarUI();
+            }
         }
+
         function editarVenta(i) {
             let datos = JSON.parse(localStorage.getItem('bd_ventas'));
             let item = datos[i];
-            borrarVenta(i);
-
+            
+            document.getElementById('venIndexHidden').value = i;
             document.getElementById('venProd').value = item.producto; 
             document.getElementById('venCli').value = item.cliente;
             document.getElementById('venPrecio').value = (item.total / item.cantidad).toFixed(2);
             document.getElementById('venCant').value = item.cantidad; 
             document.getElementById('venTotal').value = item.total;
+            
+            document.getElementById('btnGuardarVen').innerText = "Actualizar Venta";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        // Permisos ver ventas
         function generarFilaVenta(v, i, bd, tabla) {
             let currentUser = localStorage.getItem('sesion_suplementos');
             let isAdmin = (credenciales[currentUser] && credenciales[currentUser].rol === 'admin');
