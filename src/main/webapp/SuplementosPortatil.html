@@ -7,8 +7,8 @@
     <style>
         .oculto { display: none !important; }
         
-        /* STILOS DE DASHBOARD */
-        .card-custom { 
+        /* ESTILOS DE DASHBOARD Y MODALES (DARK THEME) */
+        .card-custom, .modal-custom { 
             background-color: #000 !important; 
             border: 2px solid #fff !important; 
             color: #fff !important;
@@ -29,7 +29,7 @@
             font-weight: bold;
         }
 
-        /* ESTILOS DE IMPRESIÓN PARA EL TICKET */
+        /* ESTILOS DE IMPRESIÓN PARA TICKETS Y FACTURAS */
         @media print {
             body * { visibility: hidden !important; }
             #zonaTicket, #zonaTicket * { visibility: visible !important; }
@@ -49,17 +49,83 @@
     <!-- MODAL VISTA PREVIA DEL TICKET -->
     <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-dark">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title fw-bold">Vista Previa del Ticket</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content modal-custom border-warning">
+                <div class="modal-header bg-dark border-bottom border-warning">
+                    <h5 class="modal-title fw-bold text-warning">Vista Previa del Ticket</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body d-flex justify-content-center bg-light" id="ticketModalBody">
+                <div class="modal-body d-flex justify-content-center bg-dark" id="ticketModalBody">
                     <!-- El diseño del ticket se inyecta aquí -->
                 </div>
-                <div class="modal-footer bg-light d-print-none">
-                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Cerrar sin imprimir</button>
-                    <button type="button" class="btn btn-primary fw-bold" onclick="window.print()">🖨️ Imprimir Ticket</button>
+                <div class="modal-footer bg-dark border-top border-warning d-print-none">
+                    <button type="button" class="btn btn-outline-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-warning fw-bold text-dark" onclick="window.print()">🖨️ Imprimir Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE FACTURACIÓN -->
+    <div class="modal fade" id="facturaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-custom border-info">
+                <div class="modal-header bg-dark border-bottom border-info">
+                    <h5 class="modal-title fw-bold text-info">Generar Factura (CFDI 4.0 Simulada)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-dark text-dark">
+                    <form id="formFacturacion" onsubmit="imprimirFactura(event)">
+                        <input type="hidden" id="facTipo">
+                        <input type="hidden" id="facIndex">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating"><input type="text" id="facRFC" class="form-control" placeholder="RFC" required><label>RFC</label></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating"><input type="text" id="facNombre" class="form-control" placeholder="Razón Social" required><label>Razón Social / Nombre</label></div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select id="facUso" class="form-select" required>
+                                        <option value="G01 - Adquisición de mercancias">G01 - Adquisición de mercancias</option>
+                                        <option value="G03 - Gastos en general">G03 - Gastos en general</option>
+                                        <option value="P01 - Por definir">P01 - Por definir</option>
+                                    </select>
+                                    <label>Uso de CFDI</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select id="facMetodo" class="form-select" required>
+                                        <option value="PUE - Pago en una sola exhibición">PUE - Una sola exhibición</option>
+                                        <option value="PPD - Pago en parcialidades">PPD - Parcialidades</option>
+                                    </select>
+                                    <label>Método de Pago</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select id="facForma" class="form-select" required>
+                                        <option value="01 Efectivo">01 - Efectivo</option>
+                                        <option value="04 Tarjeta de crédito">04 - Tarjeta de crédito</option>
+                                        <option value="28 Tarjeta de débito">28 - Tarjeta de débito</option>
+                                        <option value="03 Transferencia">03 - Transferencia electrónica</option>
+                                    </select>
+                                    <label>Forma de Pago</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating"><input type="text" id="facCP" class="form-control" placeholder="Código Postal" required><label>Código Postal</label></div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-floating"><input type="email" id="facEmail" class="form-control" placeholder="Correo" required><label>Correo para envío de XML/PDF</label></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-outline-light fw-bold me-2" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-info fw-bold text-dark px-4">📄 Vista Previa e Imprimir</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -73,19 +139,26 @@
                     <h1 class="display-5 fw-bold text-warning">SUPLEMENTOS PERRONES</h1>
                     <p class="text-muted">Inicia sesión para continuar</p>
                 </div>
-                <div class="card bg-secondary text-light shadow-lg">
+                <div class="card bg-secondary text-light shadow-lg border-0">
                     <div class="card-body p-4">
                         <form id="formLogin" onsubmit="iniciarSesion(event)">
                             <div class="form-floating mb-3">
                                 <input type="text" id="loginUsr" class="form-control" required placeholder="Usuario">
-                                <label>Usuario</label>
+                                <label class="text-dark">Usuario</label>
                             </div>
                             <div class="form-floating mb-4">
                                 <input type="password" id="loginPass" class="form-control" required placeholder="Contraseña">
-                                <label>Contraseña</label>
+                                <label class="text-dark">Contraseña</label>
                             </div>
                             <button type="submit" class="btn btn-warning w-100 fw-bold fs-5">Ingresar al Sistema</button>
                         </form>
+                        <div class="mt-4 text-center p-3 rounded" style="background-color: rgba(0,0,0,0.3);">
+                            <small class="text-info fs-6">
+                                <b>Credenciales de prueba:</b><br>
+                                Administrador: <b>admin</b> / <b>123</b> <br>
+                                Usuario normal: <b>usuario</b> / <b>123</b>
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,7 +178,7 @@
                         <li class="nav-item"><a class="nav-link fs-5" href="#" onclick="cambiarSeccion('productos')">Productos</a></li>
                         <li class="nav-item admin-only"><a class="nav-link fs-5" href="#" onclick="cambiarSeccion('proveedores')">Proveedores</a></li>
                         <li class="nav-item"><a class="nav-link fs-5" href="#" onclick="cambiarSeccion('clientes')">Clientes</a></li>
-                        <li class="nav-item admin-only"><a class="nav-link fs-5 text-info" href="#" onclick="cambiarSecci2on('compras')">Compras</a></li>
+                        <li class="nav-item admin-only"><a class="nav-link fs-5 text-info" href="#" onclick="cambiarSeccion('compras')">Compras</a></li>
                         <li class="nav-item"><a class="nav-link fs-5 me-3" style="color: #39FF14 !important; text-shadow: 0 0 8px #39FF14;" href="#" onclick="cambiarSeccion('ventas')">Ventas</a></li>
                         <li class="nav-item">
                             <button class="btn btn-outline-danger btn-sm fw-bold" onclick="cerrarSesion()">Salir</button>
@@ -148,22 +221,37 @@
             <!-- PRODUCTOS -->
             <div id="productos" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Inventario de Productos</h2>
-                <div class="card bg-secondary text-light shadow mb-4 admin-only"> 
+                <div class="card card-custom shadow mb-4 admin-only"> 
                     <div class="card-body">
                         <form id="formProducto" onsubmit="guardarProducto(event)">
                             <input type="hidden" id="prodIdHidden" value="">
-                            <div class="row g-3 mb-3">
+                            <div class="row g-3 mb-3 text-dark">
                                 <div class="col-md-4">
                                     <div class="form-floating"><input type="text" id="prodNombre" class="form-control" placeholder="Nombre" required><label>Nombre del Producto</label></div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-floating"><input type="text" id="prodCategoria" class="form-control" placeholder="Categoría" required><label>Categoría</label></div>
+                                    <div class="form-floating">
+                                        <select id="prodCategoria" class="form-select" required>
+                                            <option value="">Selecciona una categoría...</option>
+                                            <option value="Proteínas">Proteínas (Whey, Isolate, Vegan)</option>
+                                            <option value="Creatinas">Creatinas</option>
+                                            <option value="Pre-entrenos">Pre-entrenos</option>
+                                            <option value="Aminoácidos">Aminoácidos (BCAAs / EAAs)</option>
+                                            <option value="Vitaminas y Salud">Vitaminas y Salud General</option>
+                                            <option value="Quemadores de grasa">Quemadores de grasa</option>
+                                            <option value="Ganadores de peso">Ganadores de peso (Gainers)</option>
+                                            <option value="Snacks y Barras">Snacks y Barras</option>
+                                            <option value="Accesorios">Accesorios (Shakers, Straps, etc.)</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                        <label>Categoría</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-floating"><input type="text" id="prodDesc" class="form-control" placeholder="Descripción" required><label>Descripción</label></div>
                                 </div>
                             </div>
-                            <div class="row g-3">
+                            <div class="row g-3 text-dark">
                                 <div class="col-md-4">
                                     <div class="form-floating"><input type="number" step="0.01" id="prodPrecio" class="form-control" placeholder="Precio $" required><label>Precio de Venta $</label></div>
                                 </div>
@@ -177,8 +265,8 @@
                         </form>
                     </div>
                 </div>
-                <table class="table table-dark table-striped">
-                    <thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio $</th><th>Stock</th><th class="text-center admin-only">Acciones</th></tr></thead>
+                <table class="table table-dark table-striped table-bordered border-secondary">
+                    <thead><tr class="text-warning"><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio $</th><th>Stock</th><th class="text-center admin-only">Acciones</th></tr></thead>
                     <tbody id="tablaProductos"></tbody>
                 </table>
             </div>
@@ -186,8 +274,8 @@
             <!-- PROVEEDORES -->
             <div id="proveedores" class="oculto admin-only">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Catálogo de Proveedores</h2>
-                <div class="card bg-secondary text-light shadow mb-4">
-                    <div class="card-body">
+                <div class="card card-custom shadow mb-4">
+                    <div class="card-body text-dark">
                         <form id="formProveedor" onsubmit="guardarProveedor(event)">
                             <input type="hidden" id="provIdHidden" value="">
                             <div class="row g-3 mb-3">
@@ -215,8 +303,8 @@
                         </form>
                     </div>
                 </div>
-                <table class="table table-dark table-striped">
-                    <thead><tr><th>Nombre</th><th>Correo</th><th>Contacto</th><th>RFC</th><th class="text-center">Acciones</th></tr></thead>
+                <table class="table table-dark table-striped table-bordered border-secondary">
+                    <thead><tr class="text-warning"><th>Nombre</th><th>Correo</th><th>Contacto</th><th>RFC</th><th class="text-center">Acciones</th></tr></thead>
                     <tbody id="tablaProveedores"></tbody>
                 </table>
             </div>
@@ -224,8 +312,8 @@
             <!-- CLIENTES -->
             <div id="clientes" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Directorio de Clientes</h2>
-                <div class="card bg-secondary text-light shadow mb-4">
-                    <div class="card-body">
+                <div class="card card-custom shadow mb-4">
+                    <div class="card-body text-dark">
                         <form id="formCliente" onsubmit="guardarCliente(event)">
                             <input type="hidden" id="cliIdHidden" value="">
                             <div class="row g-3 mb-3">
@@ -247,8 +335,8 @@
                         </form>
                     </div>
                 </div>
-                <table class="table table-dark table-striped">
-                    <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th class="text-center admin-only">Acciones</th></tr></thead>
+                <table class="table table-dark table-striped table-bordered border-secondary">
+                    <thead><tr class="text-warning"><th>Nombre</th><th>Teléfono</th><th>Correo</th><th class="text-center admin-only">Acciones</th></tr></thead>
                     <tbody id="tablaClientes"></tbody>
                 </table>
             </div>
@@ -257,7 +345,7 @@
             <div id="compras" class="oculto admin-only">
                 <h2 class="text-info border-bottom border-info pb-2 mb-4">Registro de Compras (Entrada de Almacén)</h2>
                 
-                <div class="row mb-3">
+                <div class="row mb-3 text-dark">
                     <div class="col-md-6">
                         <div class="form-floating">
                             <select id="compProvGlobal" class="form-select"></select>
@@ -266,10 +354,10 @@
                     </div>
                 </div>
 
-                <div class="card bg-dark border-info text-light shadow mb-4">
+                <div class="card bg-dark border border-2 border-info text-light shadow mb-4">
                     <div class="card-body">
                         <form id="formAgregarCompra" onsubmit="agregarAlCarritoCompra(event)">
-                            <div class="row g-3">
+                            <div class="row g-3 text-dark">
                                 <div class="col-md-4">
                                     <div class="form-floating">
                                         <select id="compProd" class="form-select" required></select>
@@ -295,21 +383,21 @@
                         </form>
                         
                         <hr class="border-info mt-4">
-                        <h5 class="text-info">Artículos en esta compra:</h5>
-                        <table class="table table-dark table-sm mt-3">
-                            <thead><tr><th>Producto</th><th>Costo Unit.</th><th>Cant.</th><th>Subtotal</th><th>Quitar</th></tr></thead>
+                        <h5 class="text-info">📦 Artículos en esta compra:</h5>
+                        <table class="table table-dark table-sm mt-3 border-info">
+                            <thead><tr class="text-info"><th>Producto</th><th>Costo Unit.</th><th>Cant.</th><th>Subtotal</th><th>Quitar</th></tr></thead>
                             <tbody id="tablaCarritoCompra"></tbody>
                         </table>
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <h3 class="fw-bold mb-0">Total: $<span id="compTotalGlobal">0.00</span></h3>
-                            <button onclick="finalizarCompra()" class="btn btn-info fw-bold fs-5 px-5 text-dark">Finalizar y Guardar Compra</button>
+                            <h3 class="fw-bold mb-0 text-white">Total: <span class="text-info">$<span id="compTotalGlobal">0.00</span></span></h3>
+                            <button onclick="finalizarCompra()" class="btn btn-info fw-bold fs-5 px-5 text-dark">Guardar Compra</button>
                         </div>
                     </div>
                 </div>
 
-                <h4 class="mt-5">Historial de Compras</h4>
-                <table class="table table-dark table-striped">
-                    <thead><tr><th>Fecha</th><th>Proveedor</th><th>Artículos</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
+                <h4 class="mt-5 text-info">Historial de Compras</h4>
+                <table class="table table-dark table-striped table-bordered border-secondary">
+                    <thead><tr class="text-info"><th>Fecha</th><th>Proveedor</th><th>Artículos</th><th>Total $</th><th class="text-center">Acciones</th></tr></thead>
                     <tbody id="tablaCompras"></tbody>
                 </table>
             </div>
@@ -318,7 +406,7 @@
             <div id="ventas" class="oculto">
                 <h2 class="text-success border-bottom border-success pb-2 mb-4">Punto de Venta</h2>
                 
-                <div class="row mb-3">
+                <div class="row mb-3 text-dark">
                     <div class="col-md-6">
                         <div class="form-floating">
                             <select id="venCliGlobal" class="form-select"></select>
@@ -327,10 +415,10 @@
                     </div>
                 </div>
 
-                <div class="card bg-dark border-success text-light shadow mb-4">
+                <div class="card bg-dark border border-2 border-success text-light shadow mb-4">
                     <div class="card-body">
                         <form id="formAgregarVenta" onsubmit="agregarAlCarritoVenta(event)">
-                            <div class="row g-3">
+                            <div class="row g-3 text-dark">
                                 <div class="col-md-4">
                                     <div class="form-floating">
                                         <select id="venProd" class="form-select" onchange="actualizarPrecioVenta()" required></select>
@@ -339,8 +427,8 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating">
-                                        <input type="number" step="0.01" id="venPrecio" class="form-control bg-secondary text-white" placeholder="Precio" readonly required>
-                                        <label>Precio Unitario $</label>
+                                        <input type="number" step="0.01" id="venPrecio" class="form-control bg-secondary text-white fw-bold" placeholder="Precio" readonly required>
+                                        <label class="text-light">Precio Unitario $</label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -357,20 +445,20 @@
                         
                         <hr class="border-success mt-4">
                         <h5 class="text-success">🛒 Carrito de Compras:</h5>
-                        <table class="table table-dark table-sm mt-3">
-                            <thead><tr><th>Producto</th><th>Precio Unit.</th><th>Cant.</th><th>Subtotal</th><th>Quitar</th></tr></thead>
+                        <table class="table table-dark table-sm mt-3 border-success">
+                            <thead><tr class="text-success"><th>Producto</th><th>Precio Unit.</th><th>Cant.</th><th>Subtotal</th><th>Quitar</th></tr></thead>
                             <tbody id="tablaCarritoVenta"></tbody>
                         </table>
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <h3 class="fw-bold mb-0 text-white">Total a Pagar: <span class="text-success">$<span id="venTotalGlobal">0.00</span></span></h3>
-                            <button onclick="finalizarVenta()" class="btn btn-success fw-bold fs-5 px-5">✅ Cobrar y Finalizar</button>
+                            <button onclick="finalizarVenta()" class="btn btn-success fw-bold fs-5 px-5 text-dark">✅ Cobrar y Finalizar</button>
                         </div>
                     </div>
                 </div>
 
-                <h4 class="mt-5">Historial de Ventas</h4>
-                <table class="table table-dark table-striped">
-                    <thead><tr><th>Fecha</th><th class="admin-only">Vendedor</th><th>Cliente</th><th>Artículos</th><th>Total $</th><th class="text-center">Acciones / Ticket</th></tr></thead>
+                <h4 class="mt-5 text-success">Historial de Ventas</h4>
+                <table class="table table-dark table-striped table-bordered border-secondary">
+                    <thead><tr class="text-success"><th>Fecha</th><th class="admin-only">Vendedor</th><th>Cliente</th><th>Artículos</th><th>Total $</th><th class="text-center">Doc. y Acciones</th></tr></thead>
                     <tbody id="tablaVentas"></tbody>
                 </table>
             </div>
@@ -427,7 +515,7 @@
             verificarSesion();
         }
 
-        // TICKET VISUAL Y DE IMPRESIÓN (MODAL)
+        // === SISTEMA DE TICKETS ===
         function mostrarTicket(tipo, index) {
             let bd = tipo === 'Venta' ? 'bd_ventas' : 'bd_compras';
             let datos = JSON.parse(localStorage.getItem(bd)) || [];
@@ -442,7 +530,6 @@
             let subtotal = total / 1.16;
             let iva = total - subtotal;
 
-            // Manejo de compatibilidad (datos viejos vs datos nuevos con carrito)
             let articulosHtml = "";
             if (transaccion.articulos) {
                 articulosHtml = transaccion.articulos.map(a => `
@@ -454,7 +541,6 @@
                     </tr>
                 `).join('');
             } else {
-                // Legado: Si solo había un producto en el registro
                 let pUnit = total / parseInt(transaccion.cantidad);
                 articulosHtml = `<tr>
                     <td style="text-align: left; vertical-align: top; padding-top: 4px;">${transaccion.cantidad}</td>
@@ -465,7 +551,7 @@
             }
 
             let htmlTicket = `
-                <div style="width: 320px; font-family: monospace; border: 1px dashed #000; padding: 20px;">
+                <div style="width: 320px; font-family: monospace; padding: 20px; background: white; color: black; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
                     <h3 class="text-center" style="margin-bottom: 0;">SUPLEMENTOS PERRONES</h3>
                     <p class="text-center" style="font-size: 12px; margin-top: 5px;">Tu salud al máximo nivel</p>
                     <hr style="border-top: 1px dashed black;">
@@ -499,16 +585,137 @@
                 </div>
             `;
 
-            // Inyectamos en el Modal y en la zona de impresión
             document.getElementById('ticketModalBody').innerHTML = htmlTicket;
-            document.getElementById('zonaTicket').innerHTML = htmlTicket;
+            document.getElementById('zonaTicket').innerHTML = htmlTicket; // Para la ventana de imprimir
             
-            // Mostramos el modal
             let ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
             ticketModal.show();
         }
 
-        // NAVEGACIÓN Y CARGA
+        // === SISTEMA DE FACTURACIÓN (SIMULADO) ===
+        function abrirFacturacion(tipo, index) {
+            document.getElementById('facTipo').value = tipo;
+            document.getElementById('facIndex').value = index;
+            document.getElementById('formFacturacion').reset();
+            
+            let modalFac = new bootstrap.Modal(document.getElementById('facturaModal'));
+            modalFac.show();
+        }
+
+        function imprimirFactura(e) {
+            e.preventDefault();
+            let tipo = document.getElementById('facTipo').value;
+            let index = parseInt(document.getElementById('facIndex').value);
+            
+            let bd = tipo === 'Venta' ? 'bd_ventas' : 'bd_compras';
+            let transaccion = JSON.parse(localStorage.getItem(bd))[index];
+
+            // Datos del formulario de facturación
+            let rfc = document.getElementById('facRFC').value.toUpperCase();
+            let nombre = document.getElementById('facNombre').value.toUpperCase();
+            let uso = document.getElementById('facUso').value;
+            let metodo = document.getElementById('facMetodo').value;
+            let forma = document.getElementById('facForma').value;
+            let cp = document.getElementById('facCP').value;
+
+            // Datos transaccionales
+            let total = parseFloat(transaccion.total);
+            let subtotal = total / 1.16;
+            let iva = total - subtotal;
+            let fecha = transaccion.fecha || new Date().toLocaleString('es-MX');
+
+            // Construir filas de artículos
+            let articulosHtml = "";
+            if (transaccion.articulos) {
+                articulosHtml = transaccion.articulos.map(a => `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">80141605</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${a.cantidad}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">H87</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${a.producto}</td>
+                        <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">$${(a.precio/1.16).toFixed(2)}</td>
+                        <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">$${(a.subtotal/1.16).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            } else {
+                let pUnit = total / parseInt(transaccion.cantidad);
+                articulosHtml = `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">80141605</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${transaccion.cantidad}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">H87</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${transaccion.producto}</td>
+                        <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">$${(pUnit/1.16).toFixed(2)}</td>
+                        <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">$${subtotal.toFixed(2)}</td>
+                    </tr>`;
+            }
+
+            let htmlFactura = `
+                <div style="width: 100%; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif; padding: 40px; background: white; color: black;">
+                    <table style="width: 100%; margin-bottom: 20px;">
+                        <tr>
+                            <td style="width: 50%;">
+                                <h2 style="color: #0d6efd; margin: 0;">SUPLEMENTOS PERRONES S.A. DE C.V.</h2>
+                                <p style="font-size: 12px; margin: 5px 0;">RFC: SPE240822A1A<br>Régimen Fiscal: 601 - General de Ley Personas Morales<br>Lugar de Expedición: 54700 (Cuautitlán Izcalli)</p>
+                            </td>
+                            <td style="width: 50%; text-align: right;">
+                                <h3 style="margin: 0; color: #555;">FACTURA (CFDI 4.0)</h3>
+                                <p style="font-size: 12px; margin: 5px 0;">
+                                    <b>Serie y Folio:</b> F-${String(index + 1).padStart(5, '0')}<br>
+                                    <b>Fecha y Hora:</b> ${fecha}<br>
+                                    <b>Tipo de Comprobante:</b> I - Ingreso
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 13px;">
+                        <h4 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px;">Datos del Receptor</h4>
+                        <b>RFC:</b> ${rfc} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Razón Social:</b> ${nombre} <br>
+                        <b>C.P.:</b> ${cp} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Uso CFDI:</b> ${uso}
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">ClaveProd</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Cant</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">ClaveUni</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Descripción</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Valor Unitario</th>
+                                <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Importe</th>
+                            </tr>
+                        </thead>
+                        <tbody>${articulosHtml}</tbody>
+                    </table>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                        <div style="width: 60%;">
+                            <p><b>Método de Pago:</b> ${metodo}<br>
+                            <b>Forma de Pago:</b> ${forma}<br>
+                            <b>Moneda:</b> MXN - Peso Mexicano</p>
+                        </div>
+                        <div style="width: 35%; text-align: right; border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
+                            <p style="margin: 2px 0;">Subtotal: $${subtotal.toFixed(2)}</p>
+                            <p style="margin: 2px 0;">Impuestos Trasladados (IVA 16%): $${iva.toFixed(2)}</p>
+                            <h3 style="margin: 10px 0 0 0;">Total: $${total.toFixed(2)}</h3>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 40px; font-size: 10px; color: #777; border-top: 1px solid #eee; padding-top: 10px;">
+                        <p><b>Sello Digital del CFDI:</b><br>yG5h8/jLq9kM2... (Cadena simulada para efectos de prueba) ...9bA==</p>
+                        <p><i>Este documento es una representación impresa de un CFDI simulado y no tiene validez fiscal real.</i></p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('zonaTicket').innerHTML = htmlFactura;
+            let modal = bootstrap.Modal.getInstance(document.getElementById('facturaModal'));
+            modal.hide(); // Ocultamos el modal para que no estorbe
+            setTimeout(() => window.print(), 300); // Pequeño retraso para que el navegador procese el CSS
+        }
+
+        // === NAVEGACIÓN Y CARGA ===
         function cambiarSeccion(seccionActiva) {
             let secciones = ['inicio', 'productos', 'proveedores', 'clientes', 'compras', 'ventas'];
             secciones.forEach(sec => {
@@ -537,7 +744,7 @@
             document.getElementById('dashStock').innerText = productos.reduce((acc, p) => acc + parseInt(p.stock), 0);
             document.getElementById('dashClientes').innerText = clientes.length;
 
-            let prodHTML = '<option value="">(Selecciona)</option>';
+            let prodHTML = '<option value="">(Selecciona Producto)</option>';
             productos.forEach(p => prodHTML += `<option value="${p.nombre}">${p.nombre} (Disp: ${p.stock})</option>`);
             document.getElementById('compProd').innerHTML = prodHTML;
             document.getElementById('venProd').innerHTML = prodHTML;
@@ -606,15 +813,22 @@
         function editarProducto(i) {
             let item = JSON.parse(localStorage.getItem('bd_productos'))[i]; 
             document.getElementById('prodIdHidden').value = item.id;
-            ['prodNombre','prodCategoria','prodDesc','prodPrecio','prodStock'].forEach(id => {
-                document.getElementById(id).value = item[id.replace('prod', '').toLowerCase() || 'descripcion'];
-            });
-            document.getElementById('prodPrecio').value = item.precio; document.getElementById('prodStock').value = item.stock; document.getElementById('prodDesc').value = item.descripcion;
+            
+            document.getElementById('prodNombre').value = item.nombre;
+            document.getElementById('prodDesc').value = item.descripcion;
+            document.getElementById('prodPrecio').value = item.precio; 
+            document.getElementById('prodStock').value = item.stock; 
+            
+            // Lógica para asignar categoría si existe en las opciones, si no, lo manda a "Otros"
+            let selectCat = document.getElementById('prodCategoria');
+            let optionExists = Array.from(selectCat.options).some(opt => opt.value === item.categoria);
+            selectCat.value = optionExists ? item.categoria : 'Otros';
+
             document.getElementById('btnGuardarProd').innerText = "Actualizar Producto";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function generarFilaProducto(p, i, bd, tabla) {
-            return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>$${p.precio}</td><td class="${p.stock<=5?'text-danger':'text-success'} fw-bold">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info fw-bold me-2" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
+            return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>$${p.precio}</td><td class="${p.stock<=5?'text-danger':'text-success'} fw-bold">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info fw-bold me-2 text-dark" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
         }
 
         // === MÓDULO PROVEEDORES ===
@@ -656,7 +870,7 @@
             let total = 0;
             carritoCompras.forEach((item, i) => {
                 total += item.subtotal;
-                tbody.innerHTML += `<tr><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td>${item.cantidad}</td><td>$${item.subtotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger py-0" onclick="carritoCompras.splice(${i},1); renderizarCarritoCompra()">X</button></td></tr>`;
+                tbody.innerHTML += `<tr><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td>${item.cantidad}</td><td>$${item.subtotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger py-0 fw-bold" onclick="carritoCompras.splice(${i},1); renderizarCarritoCompra()">X</button></td></tr>`;
             });
             document.getElementById('compTotalGlobal').innerText = total.toFixed(2);
         }
@@ -681,7 +895,7 @@
             if(confirm("¿Eliminar compra? Se restará el stock de los productos involucrados.")) {
                 let datos = JSON.parse(localStorage.getItem('bd_compras'));
                 let item = datos[i];
-                if(item.articulos) { item.articulos.forEach(a => actualizarStock(a.producto, a.cantidad, 'venta')); } // revierte
+                if(item.articulos) { item.articulos.forEach(a => actualizarStock(a.producto, a.cantidad, 'venta')); } 
                 else { actualizarStock(item.producto, item.cantidad, 'venta'); }
                 datos.splice(i, 1); localStorage.setItem('bd_compras', JSON.stringify(datos));
                 cargarDatos('tablaCompras', 'bd_compras', generarFilaCompra); refrescarUI();
@@ -690,7 +904,8 @@
         function generarFilaCompra(c, i, bd, tabla) {
             let arts = c.articulos ? c.articulos.map(a => `${a.cantidad}x ${a.producto}`).join('<br>') : c.producto;
             return `<tr><td>${c.fecha||'N/A'}</td><td>${c.proveedor}</td><td style="font-size:12px;">${arts}</td><td>$${parseFloat(c.total).toFixed(2)}</td><td class="text-center">
-                <button class="btn btn-sm btn-light fw-bold me-1" onclick="mostrarTicket('Compra', ${i})">Ticket</button>
+                <button class="btn btn-sm btn-light fw-bold me-1 text-dark" onclick="mostrarTicket('Compra', ${i})">Ticket</button>
+                <button class="btn btn-sm btn-outline-info fw-bold me-1" onclick="abrirFacturacion('Compra', ${i})">Facturar</button>
                 <button class="btn btn-sm btn-danger fw-bold" onclick="borrarCompra(${i})">Borrar</button>
             </td></tr>`;
         }
@@ -714,7 +929,7 @@
             let enCarrito = carritoVentas.filter(i => i.producto === prod).reduce((acc, i) => acc + i.cantidad, 0);
             
             if (!pDB || (cant + enCarrito) > pDB.stock) {
-                alert(`⚠️ Stock insuficiente. Solo hay ${pDB ? pDB.stock - enCarrito : 0} disponibles.`); return;
+                alert(`⚠️ Stock insuficiente. Solo hay ${pDB ? pDB.stock - enCarrito : 0} disponibles en almacén.`); return;
             }
 
             carritoVentas.push({ producto: prod, cantidad: cant, precio: precio, subtotal: cant * precio });
@@ -726,7 +941,7 @@
             let total = 0;
             carritoVentas.forEach((item, i) => {
                 total += item.subtotal;
-                tbody.innerHTML += `<tr><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td>${item.cantidad}</td><td>$${item.subtotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger py-0" onclick="carritoVentas.splice(${i},1); renderizarCarritoVenta()">X</button></td></tr>`;
+                tbody.innerHTML += `<tr><td>${item.producto}</td><td>$${item.precio.toFixed(2)}</td><td>${item.cantidad}</td><td>$${item.subtotal.toFixed(2)}</td><td><button class="btn btn-sm btn-danger py-0 fw-bold" onclick="carritoVentas.splice(${i},1); renderizarCarritoVenta()">X</button></td></tr>`;
             });
             document.getElementById('venTotalGlobal').innerText = total.toFixed(2);
         }
@@ -751,7 +966,7 @@
             if(confirm("¿Eliminar venta? Los artículos regresarán al inventario.")) {
                 let datos = JSON.parse(localStorage.getItem('bd_ventas'));
                 let item = datos[i];
-                if(item.articulos) { item.articulos.forEach(a => actualizarStock(a.producto, a.cantidad, 'compra')); } // revierte
+                if(item.articulos) { item.articulos.forEach(a => actualizarStock(a.producto, a.cantidad, 'compra')); } 
                 else { actualizarStock(item.producto, item.cantidad, 'compra'); }
                 datos.splice(i, 1); localStorage.setItem('bd_ventas', JSON.stringify(datos));
                 cargarDatos('tablaVentas', 'bd_ventas', generarFilaVenta); refrescarUI();
@@ -765,6 +980,7 @@
             let arts = v.articulos ? v.articulos.map(a => `${a.cantidad}x ${a.producto}`).join('<br>') : v.producto;
             return `<tr><td>${v.fecha||'N/A'}</td><td class="admin-only text-warning fw-bold">${v.vendedor||'N/A'}</td><td>${v.cliente}</td><td style="font-size:12px;">${arts}</td><td>$${parseFloat(v.total).toFixed(2)}</td><td class="text-center">
                 <button class="btn btn-sm btn-light fw-bold me-1 text-dark" onclick="mostrarTicket('Venta', ${i})">Ticket</button>
+                <button class="btn btn-sm btn-outline-success fw-bold me-1" onclick="abrirFacturacion('Venta', ${i})">Facturar</button>
                 <button class="btn btn-sm btn-danger fw-bold admin-only" onclick="borrarVenta(${i})">Borrar</button>
             </td></tr>`;
         }
