@@ -43,10 +43,8 @@
 </head>
 <body class="bg-dark text-light" onload="verificarSesion()">
 
-    <!-- ZONA DE IMPRESIÓN OCULTA -->
     <div id="zonaTicket" class="d-none text-dark bg-white"></div>
 
-    <!-- MODAL VISTA PREVIA DEL TICKET -->
     <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-custom border-warning">
@@ -55,8 +53,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex justify-content-center bg-dark" id="ticketModalBody">
-                    <!-- El diseño del ticket se inyecta aquí -->
-                </div>
+                    </div>
                 <div class="modal-footer bg-dark border-top border-warning d-print-none">
                     <button type="button" class="btn btn-outline-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-warning fw-bold text-dark" onclick="window.print()">🖨️ Imprimir Ticket</button>
@@ -65,7 +62,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE FACTURACIÓN -->
     <div class="modal fade" id="facturaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content modal-custom border-info">
@@ -123,7 +119,7 @@
                         </div>
                         <div class="d-flex justify-content-end mt-4">
                             <button type="button" class="btn btn-outline-light fw-bold me-2" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-info fw-bold text-dark px-4">📄 Vista Previa e Imprimir</button>
+                            <button type="submit" class="btn btn-info fw-bold text-dark px-4">📄 Generar Vista Previa</button>
                         </div>
                     </form>
                 </div>
@@ -131,7 +127,23 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE LOGIN -->
+    <div class="modal fade" id="facturaPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-custom border-info">
+                <div class="modal-header bg-dark border-bottom border-info">
+                    <h5 class="modal-title fw-bold text-info">Vista Previa de Factura</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex justify-content-center bg-dark" id="facturaPreviewBody" style="overflow-x: auto;">
+                    </div>
+                <div class="modal-footer bg-dark border-top border-info d-print-none">
+                    <button type="button" class="btn btn-outline-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-info fw-bold text-dark" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="loginScreen" class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-5">
@@ -165,7 +177,6 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
     <div id="appPrincipal" class="oculto">
         <nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-4 shadow">
             <div class="container">
@@ -189,36 +200,56 @@
         </nav>
 
         <div class="container pb-5">
-            <!-- DASHBOARD -->
             <div id="inicio" class="mt-4">
                 <div class="text-center mb-5">
                     <h1 class="display-4 fw-bold text-uppercase text-warning">Panel de Control Local</h1>
                     <p id="mensajeRol" class="fs-4 mt-3 text-light"></p>
                 </div>
-                <div class="row text-center g-4 justify-content-center"> 
+                <div class="row text-center g-4 justify-content-center mb-5"> 
                     <div class="col-md-4 admin-only"> 
-                        <div class="card card-custom p-4 shadow h-100">
+                        <div class="card card-custom p-4 shadow h-100 border-success">
                             <h4 class="fw-bold text-success">Ingresos Totales</h4>
                             <h1 id="dashIngresos" class="display-5 fw-bold mt-2">$0.00</h1>
                             <p class="mb-0 text-muted">No. de ventas: <span id="dashTotalVentas" class="text-white fw-bold">0</span></p>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card card-custom p-4 shadow h-100">
+                        <div class="card card-custom p-4 shadow h-100 border-warning">
                             <h4 class="fw-bold text-warning">Productos en Stock</h4>
                             <h1 id="dashStock" class="display-5 fw-bold mt-2">0</h1>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card card-custom p-4 shadow h-100">
+                        <div class="card card-custom p-4 shadow h-100 border-info">
                             <h4 class="fw-bold text-info">Clientes Registrados</h4>
                             <h1 id="dashClientes" class="display-5 fw-bold mt-2">0</h1>
                         </div>
                     </div>
                 </div>
+
+                <div class="row text-center g-4 justify-content-center admin-only pt-3 border-top border-secondary">
+                    <h3 class="text-light w-100 mb-0">Resumen Financiero</h3>
+                    <div class="col-md-4">
+                        <div class="card bg-dark border border-success p-3 shadow h-100">
+                            <h5 class="fw-bold text-success">Total Ventas (Entradas)</h5>
+                            <h2 id="resumenVentas" class="text-white">$0.00</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-dark border border-danger p-3 shadow h-100">
+                            <h5 class="fw-bold text-danger">Total Compras (Salidas)</h5>
+                            <h2 id="resumenCompras" class="text-white">$0.00</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-dark border border-light p-3 shadow h-100">
+                            <h5 class="fw-bold text-light">Balance Global</h5>
+                            <h2 id="resumenBalance">$0.00</h2>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- PRODUCTOS -->
             <div id="productos" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Inventario de Productos</h2>
                 <div class="card card-custom shadow mb-4 admin-only"> 
@@ -226,28 +257,33 @@
                         <form id="formProducto" onsubmit="guardarProducto(event)">
                             <input type="hidden" id="prodIdHidden" value="">
                             <div class="row g-3 mb-3 text-dark">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-floating"><input type="text" id="prodNombre" class="form-control" placeholder="Nombre" required><label>Nombre del Producto</label></div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-floating">
                                         <select id="prodCategoria" class="form-select" required>
-                                            <option value="">Selecciona una categoría...</option>
-                                            <option value="Proteínas">Proteínas (Whey, Isolate, Vegan)</option>
+                                            <option value="">Selecciona categoría...</option>
+                                            <option value="Proteínas">Proteínas (Whey, Vegan...)</option>
                                             <option value="Creatinas">Creatinas</option>
                                             <option value="Pre-entrenos">Pre-entrenos</option>
-                                            <option value="Aminoácidos">Aminoácidos (BCAAs / EAAs)</option>
-                                            <option value="Vitaminas y Salud">Vitaminas y Salud General</option>
-                                            <option value="Quemadores de grasa">Quemadores de grasa</option>
-                                            <option value="Ganadores de peso">Ganadores de peso (Gainers)</option>
-                                            <option value="Snacks y Barras">Snacks y Barras</option>
-                                            <option value="Accesorios">Accesorios (Shakers, Straps, etc.)</option>
+                                            <option value="Aminoácidos">Aminoácidos (BCAA/EAA)</option>
+                                            <option value="Salud y Vitaminas">Salud y Vitaminas</option>
+                                            <option value="Quemadores">Quemadores de grasa</option>
+                                            <option value="Ganadores">Ganadores (Gainers)</option>
+                                            <option value="Accesorios">Accesorios (Shakers, etc)</option>
                                             <option value="Otros">Otros</option>
                                         </select>
                                         <label>Categoría</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <select id="prodProv" class="form-select" required></select>
+                                        <label>Proveedor Asignado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-floating"><input type="text" id="prodDesc" class="form-control" placeholder="Descripción" required><label>Descripción</label></div>
                                 </div>
                             </div>
@@ -266,12 +302,11 @@
                     </div>
                 </div>
                 <table class="table table-dark table-striped table-bordered border-secondary">
-                    <thead><tr class="text-warning"><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio $</th><th>Stock</th><th class="text-center admin-only">Acciones</th></tr></thead>
+                    <thead><tr class="text-warning"><th>Nombre</th><th>Categoría</th><th>Proveedor</th><th>Precio $</th><th>Stock</th><th class="text-center admin-only">Acciones</th></tr></thead>
                     <tbody id="tablaProductos"></tbody>
                 </table>
             </div>
 
-            <!-- PROVEEDORES -->
             <div id="proveedores" class="oculto admin-only">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Catálogo de Proveedores</h2>
                 <div class="card card-custom shadow mb-4">
@@ -309,7 +344,6 @@
                 </table>
             </div>
 
-            <!-- CLIENTES -->
             <div id="clientes" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Directorio de Clientes</h2>
                 <div class="card card-custom shadow mb-4">
@@ -341,7 +375,6 @@
                 </table>
             </div>
 
-            <!-- COMPRAS (Con Carrito) -->
             <div id="compras" class="oculto admin-only">
                 <h2 class="text-info border-bottom border-info pb-2 mb-4">Registro de Compras (Entrada de Almacén)</h2>
                 
@@ -397,12 +430,11 @@
 
                 <h4 class="mt-5 text-info">Historial de Compras</h4>
                 <table class="table table-dark table-striped table-bordered border-secondary">
-                    <thead><tr class="text-info"><th>Fecha</th><th>Proveedor</th><th>Artículos</th><th>Total $</th><th class="text-center">Acciones</th></tr></thead>
+                    <thead><tr class="text-info"><th>Fecha</th><th>Proveedor</th><th>Artículos</th><th>Total $</th><th class="text-center">Doc. y Acciones</th></tr></thead>
                     <tbody id="tablaCompras"></tbody>
                 </table>
             </div>
 
-            <!-- VENTAS (Con Carrito) -->
             <div id="ventas" class="oculto">
                 <h2 class="text-success border-bottom border-success pb-2 mb-4">Punto de Venta</h2>
                 
@@ -586,13 +618,13 @@
             `;
 
             document.getElementById('ticketModalBody').innerHTML = htmlTicket;
-            document.getElementById('zonaTicket').innerHTML = htmlTicket; // Para la ventana de imprimir
+            document.getElementById('zonaTicket').innerHTML = htmlTicket; 
             
             let ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
             ticketModal.show();
         }
 
-        // === SISTEMA DE FACTURACIÓN (SIMULADO) ===
+        // === SISTEMA DE FACTURACIÓN CON VISTA PREVIA ===
         function abrirFacturacion(tipo, index) {
             document.getElementById('facTipo').value = tipo;
             document.getElementById('facIndex').value = index;
@@ -651,7 +683,7 @@
             }
 
             let htmlFactura = `
-                <div style="width: 100%; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif; padding: 40px; background: white; color: black;">
+                <div style="width: 100%; min-width: 600px; max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif; padding: 40px; background: white; color: black; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
                     <table style="width: 100%; margin-bottom: 20px;">
                         <tr>
                             <td style="width: 50%;">
@@ -709,10 +741,16 @@
                 </div>
             `;
 
+            // Insertamos la plantilla en la zona de impresión y en el nuevo Modal
             document.getElementById('zonaTicket').innerHTML = htmlFactura;
-            let modal = bootstrap.Modal.getInstance(document.getElementById('facturaModal'));
-            modal.hide(); // Ocultamos el modal para que no estorbe
-            setTimeout(() => window.print(), 300); // Pequeño retraso para que el navegador procese el CSS
+            document.getElementById('facturaPreviewBody').innerHTML = htmlFactura;
+
+            // Ocultamos el modal del formulario y abrimos el de Vista Previa
+            let formModalInstance = bootstrap.Modal.getInstance(document.getElementById('facturaModal'));
+            formModalInstance.hide();
+            
+            let previewModal = new bootstrap.Modal(document.getElementById('facturaPreviewModal'));
+            previewModal.show();
         }
 
         // === NAVEGACIÓN Y CARGA ===
@@ -735,23 +773,38 @@
 
         function refrescarUI() {
             let ventas = JSON.parse(localStorage.getItem('bd_ventas')) || [];
+            let compras = JSON.parse(localStorage.getItem('bd_compras')) || [];
             let productos = JSON.parse(localStorage.getItem('bd_productos')) || [];
             let clientes = JSON.parse(localStorage.getItem('bd_clientes')) || [];
             let proveedores = JSON.parse(localStorage.getItem('bd_proveedores')) || [];
 
-            document.getElementById('dashIngresos').innerText = '$' + ventas.reduce((acc, v) => acc + parseFloat(v.total), 0).toFixed(2);
+            // Cálculos para Dashboard y Resumen
+            let totalVentasNum = ventas.reduce((acc, v) => acc + parseFloat(v.total), 0);
+            let totalComprasNum = compras.reduce((acc, c) => acc + parseFloat(c.total), 0);
+            let balanceNum = totalVentasNum - totalComprasNum;
+
+            document.getElementById('dashIngresos').innerText = '$' + totalVentasNum.toFixed(2);
             document.getElementById('dashTotalVentas').innerText = ventas.length;
             document.getElementById('dashStock').innerText = productos.reduce((acc, p) => acc + parseInt(p.stock), 0);
             document.getElementById('dashClientes').innerText = clientes.length;
 
+            document.getElementById('resumenVentas').innerText = '$' + totalVentasNum.toFixed(2);
+            document.getElementById('resumenCompras').innerText = '$' + totalComprasNum.toFixed(2);
+            
+            let balanceEl = document.getElementById('resumenBalance');
+            balanceEl.innerText = '$' + balanceNum.toFixed(2);
+            balanceEl.className = balanceNum >= 0 ? "text-success fw-bold" : "text-danger fw-bold";
+
+            // Llenado de Combos (Se incluye Proveedor en Productos)
             let prodHTML = '<option value="">(Selecciona Producto)</option>';
-            productos.forEach(p => prodHTML += `<option value="${p.nombre}">${p.nombre} (Disp: ${p.stock})</option>`);
+            productos.forEach(p => prodHTML += `<option value="${p.nombre}">${p.nombre} (${p.proveedor || 'Sin Prov.'}) - Disp: ${p.stock}</option>`);
             document.getElementById('compProd').innerHTML = prodHTML;
             document.getElementById('venProd').innerHTML = prodHTML;
 
             let provHTML = '<option value="">(Selecciona Proveedor)</option>';
             proveedores.forEach(p => provHTML += `<option value="${p.nombre}">${p.nombre}</option>`);
             document.getElementById('compProvGlobal').innerHTML = provHTML;
+            document.getElementById('prodProv').innerHTML = provHTML;
 
             let cliHTML = '<option value="">(Público General / Selecciona Cliente)</option>';
             clientes.forEach(c => cliHTML += `<option value="${c.nombre}">${c.nombre}</option>`);
@@ -796,6 +849,7 @@
             let p = { 
                 nombre: document.getElementById('prodNombre').value, 
                 categoria: document.getElementById('prodCategoria').value, 
+                proveedor: document.getElementById('prodProv').value,
                 descripcion: document.getElementById('prodDesc').value,
                 precio: document.getElementById('prodPrecio').value, 
                 stock: parseInt(document.getElementById('prodStock').value) || 0
@@ -813,22 +867,23 @@
         function editarProducto(i) {
             let item = JSON.parse(localStorage.getItem('bd_productos'))[i]; 
             document.getElementById('prodIdHidden').value = item.id;
-            
             document.getElementById('prodNombre').value = item.nombre;
             document.getElementById('prodDesc').value = item.descripcion;
             document.getElementById('prodPrecio').value = item.precio; 
             document.getElementById('prodStock').value = item.stock; 
             
-            // Lógica para asignar categoría si existe en las opciones, si no, lo manda a "Otros"
+            // Asignar combos
             let selectCat = document.getElementById('prodCategoria');
             let optionExists = Array.from(selectCat.options).some(opt => opt.value === item.categoria);
             selectCat.value = optionExists ? item.categoria : 'Otros';
+            
+            document.getElementById('prodProv').value = item.proveedor || '';
 
             document.getElementById('btnGuardarProd').innerText = "Actualizar Producto";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function generarFilaProducto(p, i, bd, tabla) {
-            return `<tr><td>${p.id}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>$${p.precio}</td><td class="${p.stock<=5?'text-danger':'text-success'} fw-bold">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info fw-bold me-2 text-dark" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
+            return `<tr><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.proveedor || 'N/A'}</td><td>$${p.precio}</td><td class="${p.stock<=5?'text-danger':'text-success'} fw-bold">${p.stock}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info fw-bold me-2 text-dark" onclick="editarProducto(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProducto)">Borrar</button></td></tr>`;
         }
 
         // === MÓDULO PROVEEDORES ===
@@ -841,7 +896,18 @@
             else { p.id = generarID(datos); datos.push(p); }
             localStorage.setItem('bd_proveedores', JSON.stringify(datos)); document.getElementById('formProveedor').reset(); cargarDatos('tablaProveedores', 'bd_proveedores', generarFilaProveedor); refrescarUI();
         }
-        function generarFilaProveedor(p, i, bd, tabla) { return `<tr><td>${p.nombre}</td><td>${p.correo}</td><td>${p.contacto}</td><td>${p.rfc||'-'}</td><td class="text-center"><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProveedor)">Borrar</button></td></tr>`; }
+        function editarProveedor(i) {
+            let item = JSON.parse(localStorage.getItem('bd_proveedores'))[i]; 
+            document.getElementById('provIdHidden').value = item.id;
+            ['provNombre','provCorreo','provDir','provContacto','provRFC'].forEach(id => {
+                document.getElementById(id).value = item[id.replace('prov', '').toLowerCase()] || '';
+            });
+            document.getElementById('btnGuardarProv').innerText = "Actualizar Proveedor";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function generarFilaProveedor(p, i, bd, tabla) { 
+            return `<tr><td>${p.nombre}</td><td>${p.correo}</td><td>${p.contacto}</td><td>${p.rfc||'-'}</td><td class="text-center"><button class="btn btn-sm btn-info fw-bold me-2 text-dark" onclick="editarProveedor(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaProveedor)">Borrar</button></td></tr>`; 
+        }
 
         // === MÓDULO CLIENTES ===
         function guardarCliente(e) {
@@ -853,7 +919,18 @@
             else { c.id = generarID(datos); datos.push(c); }
             localStorage.setItem('bd_clientes', JSON.stringify(datos)); document.getElementById('formCliente').reset(); cargarDatos('tablaClientes', 'bd_clientes', generarFilaCliente); refrescarUI();
         }
-        function generarFilaCliente(c, i, bd, tabla) { return `<tr><td>${c.nombre}</td><td>${c.tel}</td><td>${c.correo}</td><td class="text-center admin-only"><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaCliente)">Borrar</button></td></tr>`; }
+        function editarCliente(i) {
+            let item = JSON.parse(localStorage.getItem('bd_clientes'))[i]; 
+            document.getElementById('cliIdHidden').value = item.id;
+            ['cliNombre','cliTel','cliCorreo'].forEach(id => {
+                document.getElementById(id).value = item[id.replace('cli', '').toLowerCase()] || '';
+            });
+            document.getElementById('btnGuardarCli').innerText = "Actualizar Cliente";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function generarFilaCliente(c, i, bd, tabla) { 
+            return `<tr><td>${c.nombre}</td><td>${c.tel}</td><td>${c.correo}</td><td class="text-center admin-only"><button class="btn btn-sm btn-info fw-bold me-2 text-dark" onclick="editarCliente(${i})">Editar</button><button class="btn btn-sm btn-danger fw-bold" onclick="eliminarDato(${i}, '${bd}', '${tabla}', generarFilaCliente)">Borrar</button></td></tr>`; 
+        }
 
         // === MÓDULO COMPRAS (ENTRADAS) ===
         function agregarAlCarritoCompra(e) {
