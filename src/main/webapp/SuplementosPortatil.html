@@ -29,22 +29,42 @@
             font-weight: bold;
         }
 
-        /* ESTILOS DE IMPRESIÓN PARA TICKETS Y FACTURAS */
+        /* ESTILOS DE IMPRESIÓN CORREGIDOS PARA TICKETS Y FACTURAS */
         @media print {
-            body * { visibility: hidden !important; }
-            #zonaTicket, #zonaTicket * { visibility: visible !important; }
-            #zonaTicket {
-                position: absolute; left: 0; top: 0; width: 100%;
-                color: black !important; background: white !important;
+            /* Ocultamos absolutamente todo lo que esté en el body EXCEPTO la zona del ticket */
+            body > :not(#zonaTicket) { 
+                display: none !important; 
             }
-            .d-print-none { display: none !important; }
+            
+            /* Forzamos a la zona del ticket a mostrarse, anulando el d-none */
+            #zonaTicket {
+                display: block !important;
+                visibility: visible !important;
+                position: relative !important;
+                left: 0; 
+                top: 0; 
+                width: 100%;
+                color: black !important; 
+                background: white !important;
+            }
+
+            #zonaTicket * {
+                visibility: visible !important;
+            }
+
+            /* Por si Bootstrap mete un fondo negro del modal */
+            .modal-backdrop {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body class="bg-dark text-light" onload="verificarSesion()">
 
+    <!-- ZONA DE IMPRESIÓN OCULTA -->
     <div id="zonaTicket" class="d-none text-dark bg-white"></div>
 
+    <!-- MODAL VISTA PREVIA DEL TICKET -->
     <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-custom border-warning">
@@ -53,7 +73,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex justify-content-center bg-dark" id="ticketModalBody">
-                    </div>
+                    <!-- El diseño del ticket se inyecta aquí -->
+                </div>
                 <div class="modal-footer bg-dark border-top border-warning d-print-none">
                     <button type="button" class="btn btn-outline-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-warning fw-bold text-dark" onclick="window.print()">🖨️ Imprimir Ticket</button>
@@ -62,6 +83,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE FORMULARIO DE FACTURACIÓN -->
     <div class="modal fade" id="facturaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content modal-custom border-info">
@@ -127,6 +149,7 @@
         </div>
     </div>
 
+    <!-- MODAL VISTA PREVIA DE FACTURA -->
     <div class="modal fade" id="facturaPreviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content modal-custom border-info">
@@ -135,7 +158,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex justify-content-center bg-dark" id="facturaPreviewBody" style="overflow-x: auto;">
-                    </div>
+                    <!-- El diseño de la factura se inyecta aquí -->
+                </div>
                 <div class="modal-footer bg-dark border-top border-info d-print-none">
                     <button type="button" class="btn btn-outline-light fw-bold" data-bs-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-info fw-bold text-dark" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
@@ -144,6 +168,7 @@
         </div>
     </div>
 
+    <!-- PANTALLA DE LOGIN -->
     <div id="loginScreen" class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-5">
@@ -177,6 +202,7 @@
         </div>
     </div>
 
+    <!-- APLICACIÓN PRINCIPAL -->
     <div id="appPrincipal" class="oculto">
         <nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-4 shadow">
             <div class="container">
@@ -200,11 +226,13 @@
         </nav>
 
         <div class="container pb-5">
+            <!-- DASHBOARD -->
             <div id="inicio" class="mt-4">
                 <div class="text-center mb-5">
                     <h1 class="display-4 fw-bold text-uppercase text-warning">Panel de Control Local</h1>
                     <p id="mensajeRol" class="fs-4 mt-3 text-light"></p>
                 </div>
+                <!-- Cajas Generales -->
                 <div class="row text-center g-4 justify-content-center mb-5"> 
                     <div class="col-md-4 admin-only"> 
                         <div class="card card-custom p-4 shadow h-100 border-success">
@@ -217,9 +245,11 @@
                         <div class="card card-custom p-4 shadow h-100 border-warning">
                             <h4 class="fw-bold text-warning">Productos en Stock</h4>
                             <h1 id="dashStock" class="display-5 fw-bold mt-2">0</h1>
+                            <!-- VISTA PREVIA DE STOCK -->
                             <hr class="border-secondary mt-3 mb-2">
                             <div id="dashStockList" class="text-start mt-2" style="max-height: 120px; overflow-y: auto; font-size: 13px;">
-                                </div>
+                                <!-- Se llena dinámicamente -->
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -230,6 +260,7 @@
                     </div>
                 </div>
 
+                <!-- Resumen Financiero de Compras y Ventas -->
                 <div class="row text-center g-4 justify-content-center admin-only pt-3 border-top border-secondary">
                     <h3 class="text-light w-100 mb-0">Resumen Financiero</h3>
                     <div class="col-md-4">
@@ -253,6 +284,7 @@
                 </div>
             </div>
 
+            <!-- PRODUCTOS -->
             <div id="productos" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Inventario de Productos</h2>
                 <div class="card card-custom shadow mb-4 admin-only"> 
@@ -311,6 +343,7 @@
                 </table>
             </div>
 
+            <!-- PROVEEDORES -->
             <div id="proveedores" class="oculto admin-only">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Catálogo de Proveedores</h2>
                 <div class="card card-custom shadow mb-4">
@@ -349,6 +382,7 @@
                 </table>
             </div>
 
+            <!-- CLIENTES -->
             <div id="clientes" class="oculto">
                 <h2 class="text-warning border-bottom border-warning pb-2 mb-4">Directorio de Clientes</h2>
                 <div class="card card-custom shadow mb-4">
@@ -381,6 +415,7 @@
                 </table>
             </div>
 
+            <!-- COMPRAS (Con Carrito) -->
             <div id="compras" class="oculto admin-only">
                 <h2 class="text-info border-bottom border-info pb-2 mb-4">Registro de Compras (Entrada de Almacén)</h2>
                 
@@ -441,6 +476,7 @@
                 </table>
             </div>
 
+            <!-- VENTAS (Con Carrito) -->
             <div id="ventas" class="oculto">
                 <h2 class="text-success border-bottom border-success pb-2 mb-4">Punto de Venta</h2>
                 
